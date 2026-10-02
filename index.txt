@@ -1,0 +1,1234 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="dark">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>AVL Tree — Interactive Classroom + CDAC Challenge</title>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;600;700&display=swap" rel="stylesheet">
+<script src="https://unpkg.com/react@18/umd/react.production.min.js" crossorigin></script>
+<script src="https://unpkg.com/react-dom@18/umd/react-dom.production.min.js" crossorigin></script>
+<script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+<style>
+:root{--bg:#090d18;--card:rgba(255,255,255,.045);--card2:rgba(255,255,255,.08);--bd:rgba(255,255,255,.1);--tx:#e9edf7;--mut:#94a0bc;--ac:#7c9cff;--ac2:#a78bfa;--ok:#34d399;--bad:#fb7185;--warn:#fbbf24;--code:#0a0f1d;--edge:rgba(148,160,188,.55);--shadow:0 10px 40px rgba(0,0,0,.35);--grid:rgba(124,156,255,.07)}
+[data-theme=light]{--bg:#f2f4fb;--card:rgba(255,255,255,.75);--card2:rgba(255,255,255,.95);--bd:rgba(25,35,70,.12);--tx:#121830;--mut:#56617f;--ac:#4a63e7;--ac2:#7c4dff;--ok:#0f9f6e;--bad:#e11d48;--warn:#b7791f;--code:#f3f5fb;--edge:rgba(60,72,110,.45);--shadow:0 10px 30px rgba(30,40,90,.12);--grid:rgba(74,99,231,.09)}
+html{font-size:16px;scroll-behavior:smooth}html.teach{font-size:19px}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--tx);font-family:Inter,system-ui,sans-serif;overflow-x:hidden;line-height:1.55}
+.bgfx{position:fixed;inset:0;z-index:-1;background:radial-gradient(900px 500px at 15% -10%,rgba(124,156,255,.16),transparent 60%),radial-gradient(800px 500px at 100% 10%,rgba(167,139,250,.12),transparent 60%),var(--bg)}
+.bgfx::after{content:"";position:absolute;inset:0;background-image:linear-gradient(var(--grid) 1px,transparent 1px),linear-gradient(90deg,var(--grid) 1px,transparent 1px);background-size:44px 44px;-webkit-mask-image:radial-gradient(ellipse at 50% 30%,#000 20%,transparent 75%);mask-image:radial-gradient(ellipse at 50% 30%,#000 20%,transparent 75%);animation:drift 30s linear infinite}
+@keyframes drift{to{background-position:44px 44px}}
+.glass{background:var(--card);border:1px solid var(--bd);backdrop-filter:blur(14px);-webkit-backdrop-filter:blur(14px);box-shadow:var(--shadow)}
+.mut{color:var(--mut)}
+.top{position:sticky;top:0;z-index:40;display:flex;align-items:center;gap:.75rem;padding:.6rem 1rem;border-width:0 0 1px 0;border-radius:0}
+.brand{font-weight:800;white-space:nowrap}
+.tabs{display:flex;gap:.3rem;overflow-x:auto;flex:1;min-width:0;scrollbar-width:none}.tabs::-webkit-scrollbar{display:none}
+.tab{border:1px solid transparent;background:transparent;color:var(--mut);padding:.4rem .7rem;border-radius:999px;font-size:.78rem;font-weight:600;cursor:pointer;white-space:nowrap;transition:.2s;font-family:inherit}
+.tab:hover{color:var(--tx);background:var(--card2)}
+.tab.on{color:#fff;background:linear-gradient(135deg,var(--ac),var(--ac2))}
+.tab.done b{color:var(--ok)}
+.ctl{display:flex;gap:.4rem;margin-left:auto}
+.pbar{position:fixed;top:0;left:0;height:3px;z-index:60;background:linear-gradient(90deg,var(--ac),var(--ac2));transition:width .5s}
+.bar{position:fixed;left:0;right:0;bottom:0;z-index:40;display:flex;align-items:center;justify-content:center;gap:1rem;padding:.6rem 1rem;border-width:1px 0 0 0;border-radius:0;flex-wrap:wrap}
+.dots{display:flex;gap:.45rem}
+.dot{width:10px;height:10px;border-radius:50%;background:var(--bd);border:0;padding:0;cursor:pointer;transition:.25s;display:inline-block}
+.dot.on{background:var(--ac);transform:scale(1.35)}.dot.done{background:var(--ok)}
+.where{font-size:.8rem;font-weight:700;color:var(--mut);white-space:nowrap}
+.teach .hide-teach{display:none!important}
+.btn{border:1px solid var(--bd);background:var(--card2);color:var(--tx);padding:.5rem .9rem;border-radius:10px;font-weight:600;font-size:.82rem;cursor:pointer;transition:.2s;font-family:inherit}
+.btn:hover:not(:disabled){transform:translateY(-1px);border-color:var(--ac)}
+.btn:active:not(:disabled){transform:scale(.97)}
+.btn:disabled{opacity:.4;cursor:not-allowed}
+.btn.pri{background:linear-gradient(135deg,var(--ac),var(--ac2));color:#fff;border-color:transparent}
+.btn.on{border-color:var(--ac);background:rgba(124,156,255,.18)}
+.btn.big{padding:.9rem 1.8rem;font-size:1rem;border-radius:14px}
+input.in{background:var(--card2);border:1px solid var(--bd);color:var(--tx);padding:.5rem .7rem;border-radius:10px;width:5.5rem;font-family:inherit}
+.wrap{max-width:1150px;margin:0 auto;padding:1.25rem 1rem 7rem}
+.stage{animation:stg .5s ease backwards}
+@keyframes stg{from{opacity:0;transform:translateY(16px)}}
+@keyframes pop{from{opacity:0;transform:scale(.5)}}
+.block{border-radius:20px;padding:1.4rem;margin-bottom:1.4rem;transition:opacity .4s,filter .4s,transform .6s,box-shadow .3s}
+.block.rv{opacity:0;transform:translateY(20px)}.block.rv.in{opacity:1;transform:none}
+.block.dim{opacity:.22!important;filter:blur(1.5px)}
+.block.spot{box-shadow:0 0 0 2px var(--ac),var(--shadow)}
+.kick{font-size:.72rem;letter-spacing:.14em;text-transform:uppercase;font-weight:700;color:var(--ac)}
+.bh h2{margin:.2rem 0 .9rem;font-size:1.55rem;font-weight:800;letter-spacing:-.01em}
+h3.q{font-size:1.15rem;margin:1.1rem 0 .6rem}
+.grid2{display:grid;grid-template-columns:repeat(auto-fit,minmax(min(100%,300px),1fr));gap:1rem}
+.grid3{display:grid;grid-template-columns:repeat(auto-fit,minmax(min(100%,190px),1fr));gap:1rem}
+.grid4{display:grid;grid-template-columns:repeat(auto-fit,minmax(min(100%,150px),1fr));gap:1rem}
+.card{background:var(--card2);border:1px solid var(--bd);border-radius:16px;padding:1rem 1.1rem;min-width:0}
+.card h4{margin:0 0 .35rem;font-size:.95rem}
+.card.ok{border-color:var(--ok);background:rgba(52,211,153,.1)}
+.card.bad{border-color:var(--bad);background:rgba(251,113,133,.08)}
+.lift{transition:.25s;cursor:pointer}.lift:hover{transform:translateY(-4px);border-color:var(--ac)}
+.lift.sel{border-color:var(--ac);box-shadow:0 0 0 2px rgba(124,156,255,.35)}
+.rise{animation:stg .8s ease backwards}
+.kw{background:rgba(124,156,255,.14);color:var(--ac);border:0;border-bottom:1.5px dashed var(--ac);padding:0 .25rem;border-radius:4px;font:inherit;font-weight:600;cursor:pointer}
+.kw:hover{background:rgba(124,156,255,.28)}
+.pop{position:fixed;left:50%;transform:translateX(-50%);bottom:5.2rem;z-index:70;width:min(420px,calc(100vw - 24px));padding:1rem 2.5rem 1rem 1.1rem;border-radius:16px;animation:stg .3s ease backwards}
+.pop p{margin:.3rem 0 0;color:var(--mut)}
+.pop .x{position:absolute;right:.6rem;top:.5rem;background:none;border:0;color:var(--mut);cursor:pointer;font-size:1rem}
+.exp-body{margin-top:.6rem;padding:.8rem 1rem;border-left:3px solid var(--ac);background:var(--card);border-radius:0 12px 12px 0;animation:stg .3s ease backwards}
+.opt{display:flex;gap:.7rem;width:100%;text-align:left;margin:.45rem 0;padding:.8rem 1rem;border-radius:12px;border:1px solid var(--bd);background:var(--card2);color:var(--tx);font:inherit;cursor:pointer;transition:.2s}
+.opt:hover:not(:disabled){border-color:var(--ac);transform:translateX(3px)}
+.opt .l{font-weight:800;color:var(--ac);flex:none}
+.opt.ok{border-color:var(--ok);background:rgba(52,211,153,.12)}
+.opt.bad{border-color:var(--bad);background:rgba(251,113,133,.1)}
+.opts4{display:grid;grid-template-columns:repeat(auto-fit,minmax(110px,1fr));gap:.6rem;margin:.6rem 0}
+.opts4 .opt{justify-content:center;margin:0;font-weight:800;font-size:1.05rem}
+.why{margin-top:.8rem;padding:.8rem 1rem;border-radius:12px;background:var(--card);border:1px solid var(--bd);animation:stg .35s ease backwards}
+.meter{height:6px;border-radius:9px;background:var(--bd);overflow:hidden;margin:.5rem 0 1rem}
+.meter>i{display:block;height:100%;background:linear-gradient(90deg,var(--ac),var(--ac2));transition:width .5s}
+.row{display:flex;gap:.5rem;flex-wrap:wrap;align-items:center;margin-top:.8rem}
+.tag{font-size:.62rem;letter-spacing:.08em;padding:.12rem .5rem;border-radius:999px;background:rgba(124,156,255,.18);color:var(--ac);font-weight:800;display:inline-block}
+.tag.t2{background:rgba(251,191,36,.18);color:var(--warn)}
+.tag.t3{background:rgba(251,113,133,.18);color:var(--bad)}
+.tag.t4{background:rgba(52,211,153,.18);color:var(--ok)}
+.treebox{border:1px dashed var(--bd);border-radius:16px;background:var(--card);padding:.3rem;min-width:0;overflow:hidden}
+svg .edge{stroke:var(--edge);stroke-width:2.5;stroke-linecap:round}
+svg .tn{fill:var(--card2);stroke:var(--ac);stroke-width:2.5;transition:stroke .3s,fill .3s}
+svg .tn.ok{stroke:var(--ok)}svg .tn.warn{stroke:var(--warn)}
+svg .tn.bad{stroke:var(--bad);fill:rgba(251,113,133,.16)}
+svg .tn.path{stroke:var(--ac);fill:rgba(124,156,255,.22)}
+svg .tn.chk{stroke:var(--warn);fill:rgba(251,191,36,.18)}
+svg .tn.new{stroke:var(--ac2);fill:rgba(167,139,250,.25)}
+svg .tn.pivot{stroke:var(--warn);fill:rgba(251,191,36,.2)}
+svg .tn.found{stroke:var(--ok);fill:rgba(52,211,153,.22)}
+svg .tn.del{stroke:var(--bad);stroke-dasharray:5 3}
+svg .tn.sel{stroke-width:5}
+svg .tt{fill:var(--tx);font:700 16px 'JetBrains Mono',monospace}
+svg .tb{font:700 11px 'JetBrains Mono',monospace;fill:var(--mut)}
+svg .tb.ok{fill:var(--ok)}svg .tb.warn{fill:var(--warn)}svg .tb.bad{fill:var(--bad)}
+svg .th{font:600 10px 'JetBrains Mono',monospace;fill:var(--mut)}
+svg .empty{fill:var(--mut);font:600 14px Inter,sans-serif}
+.stats{display:flex;gap:.6rem;flex-wrap:wrap;margin-top:.6rem}
+.stat{flex:1;min-width:110px;padding:.55rem .8rem;border-radius:12px;background:var(--card2);border:1px solid var(--bd)}
+.stat b{display:block;font-size:1.3rem;font-family:'JetBrains Mono',monospace}.stat span{font-size:.72rem;color:var(--mut)}
+.mono{font-family:'JetBrains Mono',monospace;font-size:.9rem;line-height:1.8}
+.res{margin-top:.6rem;padding:.6rem .8rem;border-radius:10px;background:rgba(52,211,153,.1);font-family:'JetBrains Mono',monospace;font-size:.85rem;word-break:break-word}
+.badge{display:inline-block;padding:.25rem .7rem;border-radius:999px;font-weight:700;font-size:.82rem}
+.badge.ok{background:rgba(52,211,153,.15);color:var(--ok)}.badge.warn{background:rgba(251,191,36,.15);color:var(--warn)}.badge.bad{background:rgba(251,113,133,.15);color:var(--bad)}
+.warnbox{margin:.6rem 0;padding:.5rem .8rem;border-radius:10px;background:rgba(251,191,36,.12);color:var(--warn);font-size:.85rem}
+.code{background:var(--code);border:1px solid var(--bd);border-radius:14px;padding:.6rem 0;font-family:'JetBrains Mono',monospace;font-size:.82rem;overflow:auto;position:relative}
+.code.tall{max-height:430px}
+.ln{display:flex;padding:.1rem .9rem .1rem 0;border-left:3px solid transparent;cursor:default}
+.ln .no{flex:none;width:2.6rem;text-align:right;padding-right:.8rem;color:var(--mut);opacity:.6;user-select:none}
+.ln code{white-space:pre;font-family:inherit}
+.ln.on{background:rgba(124,156,255,.18);border-left-color:var(--ac)}
+.k{color:#c792ea}.t{color:#7fdbca}.n{color:#f78c6c}.c{color:#6b7a99;font-style:italic}
+[data-theme=light] .k{color:#7c3aed}[data-theme=light] .t{color:#0e7490}[data-theme=light] .n{color:#c2410c}
+.rail{display:flex;flex-wrap:wrap;gap:.35rem;align-items:center;margin-bottom:1rem}
+.rail .arr{color:var(--mut);font-size:.8rem}
+.chip{border:1px solid var(--bd);background:var(--card2);color:var(--mut);padding:.35rem .8rem;border-radius:999px;font:600 .78rem Inter,sans-serif;cursor:pointer;transition:.2s}
+.chip:hover{color:var(--tx);border-color:var(--ac)}
+.chip.on{background:linear-gradient(135deg,var(--ac),var(--ac2));color:#fff;border-color:transparent}
+.cklist{list-style:none;padding:0;margin:0}
+.cklist li{display:flex;gap:.6rem;padding:.35rem 0;font-size:.88rem;transition:.3s}
+.cklist li.wait{opacity:.4}.cklist li.now{color:var(--warn);font-weight:600}.cklist li.done{color:var(--ok)}.cklist li.skip{opacity:.5}.cklist li.red{color:var(--bad);font-weight:600}
+.cklist .ic{flex:none;width:1.4rem;text-align:center}
+.pipe{display:grid;grid-template-columns:repeat(auto-fit,minmax(130px,1fr));gap:.5rem;margin-top:.8rem}
+.pipe>div{padding:.55rem .7rem;border-radius:12px;background:var(--card2);border:1px solid var(--bd);font-size:.78rem;min-width:0;word-break:break-word}
+.pipe b{display:block;font-size:.65rem;letter-spacing:.1em;color:var(--ac);margin-bottom:.15rem}
+.pipe .hot{border-color:var(--warn)}
+.log{font-family:'JetBrains Mono',monospace;font-size:.78rem;margin-top:.6rem}
+.log div{padding:.12rem 0;color:var(--mut)}.log div.cur{color:var(--warn)}
+.stepper{display:flex;gap:.5rem;margin-bottom:.8rem;flex-wrap:wrap;align-items:center}
+.sdot{padding:.35rem .8rem;border-radius:999px;border:1px solid var(--bd);background:var(--card2);color:var(--mut);font:700 .75rem Inter,sans-serif;cursor:pointer}
+.sdot.on{background:linear-gradient(135deg,var(--ac),var(--ac2));color:#fff;border-color:transparent}.sdot.done{border-color:var(--ok);color:var(--ok)}
+.check{display:flex;gap:.8rem;padding:.6rem 0;border-bottom:1px solid var(--bd);animation:stg .5s ease backwards}
+.check i{flex:none;width:1.6rem;height:1.6rem;border-radius:50%;background:var(--ok);color:#fff;display:grid;place-items:center;font-style:normal;font-weight:800;font-size:.85rem;animation:pop .5s cubic-bezier(.2,1.4,.4,1) backwards}
+.cmp{width:100%;border-collapse:collapse;font-size:.9rem}.cmp th,.cmp td{padding:.55rem .7rem;border-bottom:1px solid var(--bd);text-align:left}.cmp th{color:var(--mut);font-size:.75rem;letter-spacing:.08em}
+.bars{display:grid;gap:.7rem;margin-top:.8rem}
+.bars .b{height:12px;border-radius:9px;transition:width .6s}
+.mm{display:flex;flex-direction:column;align-items:center}
+.mmn{border:1px solid var(--bd);background:var(--card2);color:var(--tx);font:inherit;font-weight:600;font-size:.88rem;padding:.5rem .95rem;border-radius:999px;cursor:pointer;transition:.25s}
+.mmn:hover{border-color:var(--ac);transform:translateY(-2px)}
+.mmn.on{background:linear-gradient(135deg,var(--ac),var(--ac2));color:#fff;border-color:transparent;transform:scale(1.06)}
+.mmn.root{font-size:1.05rem;padding:.7rem 1.6rem;font-weight:800}
+.mm-stub{width:2px;height:1.4rem;background:var(--bd)}
+.mm-row{display:grid;grid-template-columns:repeat(auto-fit,minmax(min(100%,190px),1fr));gap:1rem;width:100%}
+.mm-col{display:flex;flex-direction:column;align-items:center;gap:.6rem}
+.mm-kids{display:flex;flex-direction:column;gap:.45rem;align-items:center;border-top:2px solid var(--bd);padding-top:.6rem}
+.mm-detail{margin-top:1rem;width:100%;animation:stg .3s ease backwards}
+.hero{min-height:calc(100vh - 64px);display:grid;place-items:center;position:relative;text-align:center;padding:2rem 1rem;overflow:hidden}
+.hero canvas{position:absolute;inset:0;width:100%;height:100%;pointer-events:none}
+.herotree{position:absolute;left:0;right:0;bottom:0;height:62%;display:flex;justify-content:center;opacity:.3;pointer-events:none}
+.herotree>div{width:min(900px,100%);height:100%}
+.hero h1{font-size:clamp(2.4rem,8vw,5rem);font-weight:800;letter-spacing:-.03em;margin:.4rem 0;background:linear-gradient(135deg,var(--tx),var(--ac) 60%,var(--ac2));-webkit-background-clip:text;background-clip:text;color:transparent}
+.ring{width:96px;height:96px;margin:0 auto 1rem;border-radius:28px;display:grid;place-items:center;font-size:2.8rem;border:1px solid var(--bd);background:var(--card2);box-shadow:0 0 60px rgba(124,156,255,.3);animation:float 5s ease-in-out infinite}
+@keyframes float{50%{transform:translateY(-8px)}}
+.presenter{position:fixed;right:12px;bottom:4.6rem;z-index:65;width:min(340px,calc(100vw - 24px));padding:1rem;border-radius:16px;animation:stg .3s ease backwards}
+.presenter p{margin:.3rem 0 .6rem;font-size:.88rem}
+.optgrid{display:grid;grid-template-columns:repeat(auto-fit,minmax(min(100%,240px),1fr));gap:.8rem;margin:.8rem 0}
+.optgrid .card{cursor:pointer;transition:.2s}
+.optgrid .card:hover{border-color:var(--ac)}
+.qtext{font-size:1.2rem;font-weight:700;margin:.3rem 0 .8rem}
+@media(max-width:640px){.lbl,.brand{display:none}.block{padding:1rem}.bh h2{font-size:1.25rem}.bar{gap:.5rem}}
+@media(prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important}}
+</style>
+</head>
+<body>
+<div class="bgfx"></div>
+<div id="root"><p style="padding:2rem;color:#94a0bc;font-family:sans-serif">Loading… if this text stays, you are offline (CDN scripts blocked) — or press F12 and check the Console for errors.</p></div>
+
+<script type="text/babel">
+const {useState,useEffect,useRef,useCallback,useMemo,createContext,useContext,Fragment}=React;
+
+/* ===================== AVL ENGINE (pure functions) ===================== */
+const T=(key,left=null,right=null)=>({key,left,right});
+const H=n=>n?1+Math.max(H(n.left),H(n.right)):0;
+const BF=n=>n?H(n.left)-H(n.right):0;
+const sg=n=>n>0?'+'+n:String(n);
+const count=t=>t?1+count(t.left)+count(t.right):0;
+const inorder=t=>t?[...inorder(t.left),t.key,...inorder(t.right)]:[];
+const treeStr=t=>!t?'∅':(t.left||t.right)?`${t.key}(${treeStr(t.left)}, ${treeStr(t.right)})`:String(t.key);
+const rotR=y=>{const x=y.left;return T(x.key,x.left,T(y.key,x.right,y.right))};
+const rotL=x=>{const y=x.right;return T(y.key,T(x.key,x.left,y.left),y.right)};
+const replace=(t,k,fn)=>!t?t:t.key===k?fn(t):k<t.key?T(t.key,replace(t.left,k,fn),t.right):T(t.key,t.left,replace(t.right,k,fn));
+const find=(t,k)=>!t?null:t.key===k?t:find(k<t.key?t.left:t.right,k);
+const minNode=t=>t.left?minNode(t.left):t;
+const bstIns=(t,k)=>!t?T(k):k<t.key?T(t.key,bstIns(t.left,k),t.right):k>t.key?T(t.key,t.left,bstIns(t.right,k)):t;
+const bstDel=(t,k)=>{if(!t)return t;if(k<t.key)return T(t.key,bstDel(t.left,k),t.right);if(k>t.key)return T(t.key,t.left,bstDel(t.right,k));
+  if(!t.left)return t.right;if(!t.right)return t.left;const s=minNode(t.right);return T(s.key,t.left,bstDel(t.right,s.key))};
+const applyRot=(t,r)=>replace(t,r[1],r[0]==='R'?rotR:rotL);
+const RN={R:'Right rotation',L:'Left rotation'};
+const FIX={LL:'Single right rotation at the unbalanced node.',RR:'Single left rotation at the unbalanced node.',LR:'Left rotation at the left child, then right rotation at the node.',RL:'Right rotation at the right child, then left rotation at the node.'};
+
+function diagNode(n){
+  const bf=BF(n);if(Math.abs(bf)<2)return null;
+  if(bf>0){const c=n.left,cb=BF(c),kase=cb>=0?'LL':'LR';
+    return {key:n.key,bf,child:c.key,cb,kase,rots:kase==='LL'?[['R',n.key]]:[['L',c.key],['R',n.key]]}}
+  const c=n.right,cb=BF(c),kase=cb<=0?'RR':'RL';
+  return {key:n.key,bf,child:c.key,cb,kase,rots:kase==='RR'?[['L',n.key]]:[['R',c.key],['L',n.key]]};
+}
+const diagnose=t=>!t?null:(diagnose(t.left)||diagnose(t.right)||diagNode(t));
+const bal=n=>{const d=diagNode(n);if(!d)return n;let t=n;for(const r of d.rots)t=applyRot(t,r);return t};
+const avlIns=(t,k)=>!t?T(k):k<t.key?bal(T(t.key,avlIns(t.left,k),t.right)):k>t.key?bal(T(t.key,t.left,avlIns(t.right,k))):t;
+
+function walkUp(tree,anc,key,S,mode){
+  let rotated=false;
+  for(const p of anc){
+    const n=find(tree,p);if(!n)continue;
+    const l=H(n.left),r=H(n.right),bf=l-r,bad=Math.abs(bf)>1;
+    const base=mode==='insert'?{[key]:'new'}:{};
+    S.push({kind:'check',tree,hl:{...base,[p]:bad?'bad':'chk'},stage:3,bfText:`BF(${p}) = ${l} − ${r} = ${sg(bf)}`,title:`Check node ${p}`,
+      text:`Height(${p}) = ${H(n)}. Left height = ${l}, right height = ${r}, so BF = ${l} − ${r} = ${sg(bf)}. `+(bad?'That is outside −1…+1 → unbalanced!':'Within −1…+1 → this node is fine.')});
+    const d=diagNode(n);if(!d)continue;
+    S.push({kind:'imbalance',tree,hl:{[p]:'bad'},stage:4,title:`🔴 Node ${p} is unbalanced`,text:`BF(${p}) = ${sg(d.bf)}. The ${d.bf>0?'left':'right'} side is two levels taller than the other, so we must rebalance at this node.`});
+    S.push({kind:'case',tree,hl:{[p]:'bad',[d.child]:'pivot'},stage:5,kase:d.kase,title:`Case detected: ${d.kase}`,
+      text:`Heavy child ${d.child} has BF ${sg(d.cb)}. `+(d.cb===0?`It is balanced, so a single rotation is enough (${d.kase}). `:`It leans ${d.cb>0?'left':'right'}: ${d.bf>0?'Left':'Right'} then ${d.cb>0?'Left':'Right'} → ${d.kase}. `)+FIX[d.kase]});
+    d.rots.forEach((rot,idx)=>{
+      const nn=find(tree,rot[1]);const up=rot[0]==='R'?nn.left.key:nn.right.key;
+      tree=applyRot(tree,rot);
+      S.push({kind:'rotate',tree,hl:{[rot[1]]:'pivot',[up]:'found'},stage:6,kase:d.kase,rotN:idx+1,rotTotal:d.rots.length,
+        title:`${RN[rot[0]]} at ${rot[1]}`,text:`${up} moves up and ${rot[1]} comes down as its ${rot[0]==='R'?'right':'left'} child.`+(d.rots.length>1?` (rotation ${idx+1} of 2)`:'')});
+    });
+    rotated=true;if(mode==='insert')break;
+  }
+  S.push({kind:'done',tree,hl:{},stage:7,title:'✅ Tree is balanced',text:rotated?'Every node now has BF in −1…+1. The in-order order of the keys did not change — only the shape.':'No node was out of range, so no rotation was needed.'});
+  return {tree,rotated};
+}
+function insertSteps(root,key){
+  const S=[];const path=[];let c=root;while(c){path.push(c.key);c=key<c.key?c.left:c.right}
+  const t1=bstIns(root,key);
+  if(path.length)S.push({kind:'walk',tree:root,hl:Object.fromEntries(path.map(k=>[k,'path'])),stage:1,title:'BST insertion: find the spot',
+    text:path.map(k=>`${key} ${key<k?'<':'>'} ${k} → go ${key<k?'left':'right'}`).join(';  ')+'. An empty spot is found.'});
+  S.push({kind:'placed',tree:t1,hl:{[key]:'new'},stage:1,title:`Node ${key} placed`,text:path.length?`${key} becomes a new leaf, exactly like a normal BST. The tree may now be unbalanced, so we check on the way back up.`:`The tree was empty, so ${key} becomes the root.`});
+  const w=walkUp(t1,path.slice().reverse(),key,S,'insert');
+  return {steps:S,final:w.tree,rotated:w.rotated};
+}
+function deleteSteps(root,key){
+  const S=[];const path=[];let c=root;while(c){path.push(c.key);if(c.key===key)break;c=key<c.key?c.left:c.right}
+  const n=find(root,key),two=n.left&&n.right;
+  S.push({kind:'walk',tree:root,hl:Object.fromEntries(path.map(k=>[k,'path'])),stage:1,title:'BST deletion: find the node',text:`Follow the BST rule from the root until ${key} is found.`});
+  let s=null,anc=path.slice(0,-1);
+  if(two){s=minNode(n.right);const chain=[];let q=n.right;while(q.key!==s.key){chain.push(q.key);q=q.left}anc=[...anc,s.key,...chain]}
+  S.push({kind:'del',tree:root,hl:{[key]:'del'},stage:1,title:`Remove ${key}`,text:two?`${key} has two children. Replace it with its in-order successor ${s.key} (smallest key in the right subtree), then remove that successor.`:(n.left||n.right)?`${key} has one child, so that child takes its place.`:`${key} is a leaf, so it is simply removed.`});
+  const t1=bstDel(root,key);
+  S.push({kind:'placed',tree:t1,hl:two?{[s.key]:'new'}:{},stage:1,title:'BST deletion done',text:'Heights may have changed, so we check every ancestor from the bottom up. Deletion can need more than one rotation.'});
+  const w=walkUp(t1,anc.reverse(),null,S,'delete');
+  return {steps:S,final:w.tree,rotated:w.rotated};
+}
+function searchSteps(root,key){
+  if(!root)return {steps:[{kind:'search',tree:root,hl:{},title:'Empty tree',text:'There is nothing to search.'}],final:root};
+  const S=[],vis=[];let c=root,found=false;
+  while(c){vis.push(c.key);const hl=Object.fromEntries(vis.map(k=>[k,'path']));
+    if(c.key===key){hl[c.key]='found';S.push({kind:'search',tree:root,hl,title:`Found ${key}`,text:`${key} = ${c.key} → found after ${vis.length} comparison(s).`});found=true;break}
+    hl[c.key]='chk';S.push({kind:'search',tree:root,hl,title:`Compare with ${c.key}`,text:`${key} ${key<c.key?'<':'>'} ${c.key} → go ${key<c.key?'left':'right'}.`});
+    c=key<c.key?c.left:c.right}
+  if(!found)S.push({kind:'search',tree:root,hl:Object.fromEntries(vis.map(k=>[k,'path'])),title:'Not found',text:`Reached an empty spot — ${key} is not in the tree (${vis.length} comparison(s)).`});
+  return {steps:S,final:root};
+}
+// frames for animating the fix of the lowest unbalanced node
+function rotInfo(tree){
+  const d=diagnose(tree);
+  const text0=`Node ${d.key} has BF ${sg(d.bf)}; its ${d.bf>0?'left':'right'} child ${d.child} has BF ${sg(d.cb)} → ${d.kase} case.`;
+  const frames=[{tree,label:'BEFORE',hl:{[d.key]:'bad',[d.child]:'pivot'},text:text0}];
+  let t=tree;
+  d.rots.forEach((r,i)=>{
+    const nn=find(t,r[1]);const up=r[0]==='R'?nn.left.key:nn.right.key;t=applyRot(t,r);
+    const last=i===d.rots.length-1;
+    frames.push({tree:t,label:(d.rots.length>1?`AFTER ROTATION ${i+1}`:'AFTER ROTATION')+(last?' · BALANCED':''),hl:{[r[1]]:'pivot',[up]:'found'},
+      text:`${RN[r[0]]} at ${r[1]}: ${up} moves up, ${r[1]} moves down.`+(last?' ✅ Every node is back within −1…+1.':'')});
+  });
+  return {d,frames};
+}
+
+/* ===================== CONTENT ===================== */
+const CONTENT={
+topic:'AVL Tree',tagline:"Let's make the tree balance itself.",icon:'🌳',
+stages:['INTRO','BST','BALANCE','ROTATIONS','CODE','LIVE','PLAY','PRACTICE','RECAP','CHALLENGE'],
+
+glossary:{
+ binary:{t:'Binary Tree',d:'A tree where each node has at most two children (left and right). By itself there is no ordering rule.'},
+ bst:{t:'Binary Search Tree (BST)',d:'A binary tree where, for every node, keys in the left subtree are smaller and keys in the right subtree are larger. In-order traversal gives sorted order.'},
+ height:{t:'Height',d:'Levels from a node down to its deepest leaf. In this lesson an empty spot has height 0 and a leaf has height 1.'},
+ bf:{t:'Balance Factor (BF)',d:'BF = height(left) − height(right). Positive: left is taller. Negative: right is taller.'},
+ rotation:{t:'Rotation',d:'A small local re-arrangement of 2–3 nodes that lowers the heavy side and raises the other, keeping the BST ordering intact.'},
+ selfbal:{t:'Self-balancing',d:'The tree checks itself after every insert/delete and fixes any imbalance automatically.'},
+ skewed:{t:'Skewed tree',d:'A tree where every node has only one child, so it leans to one side like a chain.'},
+ subtree:{t:'Subtree',d:'A node together with everything below it.'}
+},
+
+whyBin:{
+ kid:'Lots of real data is hierarchical: a company chart, folders inside folders. A binary tree is the simplest version — every item has at most two children, a left one and a right one.',
+ tech:'A [[binary|binary tree]] is a tree in which every node has at most two children. On its own it has no ordering rule — any arrangement is a valid binary tree.',
+ kid2:'A binary tree does not tell us where to look. A BST adds one rule — smaller keys on the left, bigger keys on the right — so searching is just "compare, go left or right, repeat".',
+ tech2:'In a [[bst|BST]], for every node: left subtree keys < node key < right subtree keys. In-order traversal visits keys in ascending order. If the tree is balanced, search/insert/delete cost O(log n).'
+},
+
+problem:{keys:[10,20,30,40],points:[
+  {i:'📏',t:'The tree becomes skewed',d:'Every new key is bigger than the previous one, so it always goes to the right. There is no left side at all.'},
+  {i:'🐢',t:'Searching becomes inefficient',d:'To find 40 we must compare with 10, 20, 30 and then 40 — one comparison per node.'},
+  {i:'📈',t:'Height increases',d:'Height equals the number of nodes (n) instead of staying small.'},
+  {i:'⛓️',t:'It behaves like a linked list',d:'A BST can degrade to linked-list behaviour: operations take O(n) instead of O(log n).'}]},
+
+bstavl:{
+ kid:'Imagine a see-saw. If one side gets much heavier, it tips over. An AVL tree is a see-saw that fixes itself: whenever one side gets too tall, it quickly moves a few nodes so both sides stay about equally tall.',
+ tech:'An [[selfbal|AVL tree]] is a self-balancing [[bst|Binary Search Tree]] in which, for every node, the [[height|heights]] of the left and right [[subtree|subtrees]] differ by at most 1 (the [[bf|balance factor]] is −1, 0 or +1). When an insert or delete breaks that rule, the tree repairs itself using [[rotation|rotations]].',
+ one:'A BST that keeps itself balanced by rotating.',
+ more:'AVL is named after its inventors, Adelson-Velsky and Landis. The BST ordering rule never changes — rotations only change the shape, never the in-order sequence of keys.'
+},
+
+cases:{
+ LL:{name:'LL (Left–Left)',tree:T(30,T(20,T(10))),tip:'New node went into the LEFT subtree of the LEFT child.',fix:'Fix: one right rotation at the unbalanced node.',
+  texts:['Node 30 has BF = +2 (left height 2, right height 0). Its left child 20 also leans left (BF +1). Left then Left → LL.','Right rotation at 30: 20 moves up to become the root, 30 comes down as the right child of 20. All BFs are now 0.']},
+ RR:{name:'RR (Right–Right)',tree:T(10,null,T(20,null,T(30))),tip:'New node went into the RIGHT subtree of the RIGHT child.',fix:'Fix: one left rotation at the unbalanced node.',
+  texts:['Node 10 has BF = −2 (left height 0, right height 2). Its right child 20 also leans right (BF −1). Right then Right → RR.','Left rotation at 10: 20 moves up to become the root, 10 comes down as the left child of 20. All BFs are now 0.']},
+ LR:{name:'LR (Left–Right)',tree:T(30,T(10,null,T(20))),tip:'New node went into the RIGHT subtree of the LEFT child.',fix:'Fix: left rotation at the left child, then right rotation at the node.',
+  texts:['Node 30 has BF = +2, but its left child 10 leans RIGHT (BF −1). The path bends (Left, then Right). One rotation alone would not fix a bend.','Step 1 — left rotation at 10 (the left child): 20 moves up, 10 comes down. The bend is now a straight left line (an LL shape).','Step 2 — right rotation at 30: 20 becomes the root. Balanced.']},
+ RL:{name:'RL (Right–Left)',tree:T(10,null,T(30,T(20))),tip:'New node went into the LEFT subtree of the RIGHT child.',fix:'Fix: right rotation at the right child, then left rotation at the node.',
+  texts:['Node 10 has BF = −2, but its right child 30 leans LEFT (BF +1). The path bends (Right, then Left).','Step 1 — right rotation at 30 (the right child): 20 moves up, 30 comes down. The bend is now a straight right line (an RR shape).','Step 2 — left rotation at 10: 20 becomes the root. Balanced.']}
+},
+
+predict:[
+ T(50,T(30,T(20))),
+ T(50,T(20,null,T(30))),
+ T(15,null,T(25,null,T(35))),
+ T(40,null,T(60,T(50))),
+ T(40,T(20,T(10,T(5)),T(30)),T(60)),
+ T(20,T(10),T(40,T(30,T(25)),T(50)))
+],
+
+mistakes:[
+ {t:'Thinking every imbalance needs the same rotation',why:'There are four cases. A straight line (LL or RR) needs one rotation. A bend (LR or RL) needs two.',fix:'Look at both the heavy side and the heavy child\'s side before choosing.'},
+ {t:'Rotating at the wrong node',why:'Imbalance can show up on several ancestors. We fix the lowest unbalanced node found while walking up from the inserted node.',fix:'Start at the new node and move up, checking each BF.'},
+ {t:'Mixing up LR and RL',why:'The name tells the path: first letter = side of the heavy child, second letter = side where the extra node sits. LR = left child\'s right subtree.',fix:'Read the name as the path from the unbalanced node to the new node.'},
+ {t:'Forgetting to update heights after a rotation',why:'Balance factors depend on heights. In the Java code, y.height is recalculated before x.height because y is now the lower node.',fix:'Update the lower node first, then the new subtree root.'},
+ {t:'Believing a rotation breaks the BST order',why:'Rotations never change the in-order sequence of keys. Watch the "In-order" line in the rotation demo — it stays the same.',fix:'Check in-order before and after.'},
+ {t:'Checking balance only at the root',why:'The imbalance can be deep in the tree. Every ancestor of the inserted node must have its height and BF recalculated.',fix:'Update height and BF on the way back up the recursion.'}
+],
+
+realworld:[
+ {icon:'💻',t:'Searching',d:'Balanced height keeps lookups at O(log n) even if keys arrive in sorted order — the worst case for a plain BST.'},
+ {icon:'🗂️',t:'Data organization',d:'Keys stay in sorted order (in-order traversal), with fast insert and delete.'},
+ {icon:'⚡',t:'Efficient operations',d:'Search, insert and delete are all O(log n) in the worst case.'},
+ {icon:'🧮',t:'Algorithms',d:'Useful when an algorithm needs a dynamic ordered set, e.g. finding the smallest/next-larger key while keys keep changing.'},
+ {icon:'🗄️',t:'Data structures',d:'Ordered sets/maps are built on balanced BSTs. AVL is one such tree (Java\'s TreeMap uses a Red-Black tree, a different balanced tree). AVL is more strictly balanced, so it suits lookup-heavy work.'}
+],
+
+complexity:{rows:[['Search','O(n)','O(log n)'],['Insertion','O(n)','O(log n)'],['Deletion','O(n)','O(log n)']],
+ note:'Worst case shown. A plain BST with random input is usually fine — the danger is sorted-like input, which makes it a chain.'},
+
+recap:[
+ {q:'AVL = self-balancing BST',a:'BST ordering rule + automatic height control.'},
+ {q:'Balance Factor',a:'BF = height(left) − height(right).'},
+ {q:'Allowed range',a:'−1, 0 or +1. Anything else is unbalanced.'},
+ {q:'Detect imbalance',a:'After insert/delete, update heights and BF on the way up.'},
+ {q:'Four cases',a:'Same side → single rotation. Different sides → double rotation.'},
+ {q:'LL',a:'Left-heavy, left child leans left → right rotation.'},
+ {q:'RR',a:'Right-heavy, right child leans right → left rotation.'},
+ {q:'LR',a:'Left-heavy, left child leans right → left rotate child, then right rotate node.'},
+ {q:'RL',a:'Right-heavy, right child leans left → right rotate child, then left rotate node.'},
+ {q:'Efficient operations',a:'Search, insert, delete: O(log n).'}
+],
+
+mind:{root:'AVL Tree',d:'A self-balancing Binary Search Tree.',branches:[
+ {id:'bst',label:'BST',icon:'🌲',d:'The base: left keys smaller, right keys larger.',kids:[
+  {id:'b1',label:'Search',d:'Compare and go left or right, one path only.'},
+  {id:'b2',label:'Insert',d:'Insert like a normal BST first, then rebalance.'}]},
+ {id:'bal',label:'Balance',icon:'⚖️',d:'How the tree knows it is out of shape.',kids:[
+  {id:'a1',label:'Height',d:'Levels below a node. Empty = 0, leaf = 1.'},
+  {id:'a2',label:'BF',d:'height(left) − height(right). Allowed: −1, 0, +1.'}]},
+ {id:'rot',label:'Rotations',icon:'🔄',d:'How the tree repairs itself.',kids:[
+  {id:'r1',label:'LL',d:'Right rotation.'},{id:'r2',label:'RR',d:'Left rotation.'},
+  {id:'r3',label:'LR',d:'Left rotation on the child, then right rotation.'},{id:'r4',label:'RL',d:'Right rotation on the child, then left rotation.'}]},
+ {id:'code',label:'Java code',icon:'💻',d:'How it is implemented.',kids:[
+  {id:'c1',label:'Node + height',d:'Each node stores key, left, right and height.'},
+  {id:'c2',label:'Insertion',d:'Recursive BST insert, then update height and compute balance.'},
+  {id:'c3',label:'Rebalancing',d:'Pick LL / RR / LR / RL and call rightRotate / leftRotate.'},
+  {id:'c4',label:'Balanced tree',d:'Return the (possibly new) subtree root to the caller.'}]}
+]},
+
+notes:[
+ {say:'Why binary tree → why BST → then insert 10, 20, 30, 40. Ask: "Is this really a tree?" before revealing the four problems.',do:'Click Search to show the comparisons; reveal problems with Space.'},
+ {say:'Press MAKE IT BALANCED. Read the one-line definition.',do:'Click highlighted words when someone asks "what is that?".'},
+ {say:'Click nodes and read the BF aloud. Add 5 and watch a node turn red.',do:'Use BALANCE THE TREE to preview a rotation.'},
+ {say:'LL, RR first (single). LR, RL (bend = two rotations). Finish with the decision tool.',do:'Ask the room to predict the next step before pressing Next.'},
+ {say:'Go section by section: Node → Height → BF → Rotations → Insert → Rebalance.',do:'Ask what each line does before pressing Explain.'},
+ {say:'Run each of the four insert sequences. Point at CODE → BF → ROTATION → TREE.',do:'Press RUN, or STEP with Space.'},
+ {say:'Let someone choose the number. Walk through the checklist on the right.',do:'Load sample tree → insert 5 then 3 (LL); 25 then 27 (LR); 80 then 90 (RR).'},
+ {say:'Predict first, then reveal. Read every "Why?" aloud.',do:'Let the room vote before choosing.'},
+ {say:'Ask three people to give the 30-second recap, then reveal. End on the brain map.',do:'Use the complexity slider as a closer.'},
+ {say:'Final check: 20 CDAC-level questions. Keys A–D answer, Space continues.',do:'Review wrong answers together at the end.'}
+]};
+
+/* ===================== JAVA SOURCE ===================== */
+const JAVA=`class Node {
+    int key, height;
+    Node left, right;
+
+    Node(int key) {
+        this.key = key;
+        this.height = 1;
+    }
+}
+
+class AVLTree {
+    Node root;
+
+    int height(Node n) {
+        return (n == null) ? 0 : n.height;
+    }
+
+    int getBalance(Node n) {
+        return (n == null) ? 0 : height(n.left) - height(n.right);
+    }
+
+    Node rightRotate(Node y) {
+        Node x = y.left;
+        Node T2 = x.right;
+
+        x.right = y;
+        y.left = T2;
+
+        y.height = 1 + Math.max(height(y.left), height(y.right));
+        x.height = 1 + Math.max(height(x.left), height(x.right));
+        return x;
+    }
+
+    Node leftRotate(Node x) {
+        Node y = x.right;
+        Node T2 = y.left;
+
+        y.left = x;
+        x.right = T2;
+
+        x.height = 1 + Math.max(height(x.left), height(x.right));
+        y.height = 1 + Math.max(height(y.left), height(y.right));
+        return y;
+    }
+
+    Node insert(Node node, int key) {
+        if (node == null)
+            return new Node(key);
+
+        if (key < node.key)
+            node.left = insert(node.left, key);
+        else if (key > node.key)
+            node.right = insert(node.right, key);
+        else
+            return node;
+
+        node.height = 1 + Math.max(height(node.left), height(node.right));
+        int balance = getBalance(node);
+
+        if (balance > 1 && key < node.left.key)
+            return rightRotate(node);          // LL
+        if (balance < -1 && key > node.right.key)
+            return leftRotate(node);           // RR
+        if (balance > 1 && key > node.left.key) {
+            node.left = leftRotate(node.left); // LR
+            return rightRotate(node);
+        }
+        if (balance < -1 && key < node.right.key) {
+            node.right = rightRotate(node.right); // RL
+            return leftRotate(node);
+        }
+        return node;
+    }
+
+    public static void main(String[] args) {
+        AVLTree tree = new AVLTree();
+        int[] keys = {30, 20, 10};
+        for (int k : keys)
+            tree.root = tree.insert(tree.root, k);
+    }
+}`.split('\n');
+const at=(s,from=0)=>JAVA.findIndex((l,i)=>i>=from&&l.includes(s));
+const lineOf=(s,from=0)=>{const i=JAVA.findIndex((l,k)=>k>=from&&l.trim()===s);return i>=0?i:at(s,from)};
+const blk=s=>{const i=at(s);const ind=JAVA[i].match(/^ */)[0];const j=JAVA.findIndex((l,k)=>k>i&&l===ind+'}');return [i,j]};
+const range=(a,b)=>Array.from({length:b-a+1},(_,i)=>a+i);
+const INS=blk('Node insert(');const hIns=at('node.height = 1 + Math.max',INS[0]);
+const X=(()=>{const I0=INS[0];
+  const ifLL=at('balance > 1 && key < node.left.key',I0),ifRR=at('balance < -1 && key > node.right.key',I0),ifLR=at('balance > 1 && key > node.left.key',I0),ifRL=at('balance < -1 && key < node.right.key',I0);
+  const lr1=at('node.left = leftRotate(node.left);',I0),rl1=at('node.right = rightRotate(node.right);',I0);
+  return {ifLL,ifRR,ifLR,ifRL,lr1,rl1,retLL:at('return rightRotate(node);',ifLL),retRR:at('return leftRotate(node);',ifRR),lr2:at('return rightRotate(node);',lr1),rl2:at('return leftRotate(node);',rl1),
+    cmp:[at('if (key < node.key)',I0),at('node.left = insert',I0),at('else if (key > node.key)',I0),at('node.right = insert',I0)],
+    nul:[at('if (node == null)',I0),at('return new Node(key);',I0)],hgt:hIns,bal:hIns+1,last:INS[1]-1,loop:at('for (int k : keys)'),call:at('tree.root = tree.insert(tree.root, k);')}})();
+
+const SECS=[
+ {n:'Node',r:blk('class Node {'),b:'A Node is one circle in the tree. It remembers its number (key), its left child, its right child — and a height, which the AVL tree needs to check balance.',
+  t:'key holds the value; left and right are references to child nodes (null if there is no child); height is the height of the subtree rooted at this node. A new node is a leaf, so its height starts at 1.',
+  notes:[['int key, height;','key = the value stored. height = height of the subtree that starts at this node.'],['Node left, right;','References to the left and right child. null means "no child here".'],['this.height = 1;','A brand-new node is a leaf, so its height is 1.']]},
+ {n:'Height',r:blk('int height(Node n)'),b:'Asks: "how tall is the tree under this node?" An empty spot counts as 0.',
+  t:'Null-safe helper. It returns 0 for null, otherwise the stored n.height. This avoids a NullPointerException when a child is missing.',
+  notes:[['return (n == null)','If there is no node → 0, otherwise read the height stored in the node.']]},
+ {n:'Balance factor',r:blk('int getBalance(Node n)'),b:'Compares the two sides of a node. Left taller → positive. Right taller → negative. Equal → 0.',
+  t:'BF = height(left) − height(right). In an AVL tree the allowed values are −1, 0 and +1. A value of +2 or −2 means a rotation is required.',
+  notes:[['return (n == null)','Null node → 0. Otherwise: height of left subtree minus height of right subtree.']]},
+ {n:'Right rotation',r:blk('Node rightRotate(Node y)'),b:'Used when the LEFT side is too heavy. The left child steps up and the old top steps down to the right.',
+  t:'y is the unbalanced node, x is its left child. x becomes the new subtree root. x\'s old right subtree (T2) is re-attached as y\'s left child, which keeps the BST order. Heights are recomputed bottom-up: y first, then x.',
+  notes:[['Node x = y.left;','x is y\'s left child — it will move up.'],['Node T2 = x.right;','T2 is x\'s right subtree. Save it so it is not lost.'],['x.right = y;','y comes down to become x\'s right child.'],['y.left = T2;','T2 becomes y\'s left child (T2 is bigger than x but smaller than y, so BST order holds).'],['y.height =','Recalculate heights. y is now the lower node, so it goes first.'],['x.height =','Then x, which is now above y.'],['return x;','x is the new root of this subtree. The caller must attach it where y used to be.']]},
+ {n:'Left rotation',r:blk('Node leftRotate(Node x)'),b:'The mirror image: used when the RIGHT side is too heavy. The right child steps up and the old top steps down to the left.',
+  t:'x is the unbalanced node, y is its right child. y becomes the new subtree root. y\'s old left subtree (T2) becomes x\'s right child. Heights are recomputed: x first, then y.',
+  notes:[['Node y = x.right;','y is x\'s right child — it will move up.'],['Node T2 = y.left;','T2 is y\'s left subtree. Save it.'],['y.left = x;','x comes down to become y\'s left child.'],['x.right = T2;','T2 becomes x\'s right child.'],['x.height =','x is now the lower node: update it first.'],['y.height =','Then y.'],['return y;','y is the new root of this subtree.']]},
+ {n:'Insertion',r:[INS[0],hIns-1],b:'First insert exactly like a normal BST: go left for smaller keys, right for bigger keys, and create the node at the empty spot.',
+  t:'Recursive BST insert. The recursive call returns the (possibly new) root of the child subtree, which is stored back into node.left or node.right. Duplicate keys are ignored in this code.',
+  notes:[['if (node == null)','Found the empty spot.'],['return new Node(key);','Create the new node (a leaf) and return it to the parent.'],['if (key < node.key)','Smaller key → go left.'],['node.left = insert(node.left, key);','Recursive call on the left child; store the returned subtree back.'],['else if (key > node.key)','Bigger key → go right.'],['node.right = insert(node.right, key);','Recursive call on the right child.'],['else','Equal key: duplicates are not inserted. Return the node unchanged.']]},
+ {n:'Rebalancing',r:[hIns,INS[1]-1],b:'On the way back up, every node recalculates its height and checks its balance. If the balance is too big, it picks one of four fixes.',
+  t:'After the recursive call returns: update height, compute balance, then compare the new key with the heavy child\'s key to decide LL / RR / LR / RL and call the rotation(s).',
+  notes:[['node.height = 1 + Math.max','Update this node\'s height from its children.'],['int balance = getBalance(node);','Compute BF.'],['balance > 1 && key < node.left.key','Left-heavy and key went into the left child\'s LEFT → LL → rightRotate.'],['balance < -1 && key > node.right.key','Right-heavy and key went into the right child\'s RIGHT → RR → leftRotate.'],['balance > 1 && key > node.left.key','Left-heavy but key went into left child\'s RIGHT → LR: leftRotate the left child first, then rightRotate the node.'],['balance < -1 && key < node.right.key','Right-heavy but key went into right child\'s LEFT → RL: rightRotate the right child first, then leftRotate the node.'],['return node;','Balanced: return this node unchanged.']]}
+];
+
+/* ===================== helpers ===================== */
+const Ctx=createContext({});
+const pad=n=>String(n).padStart(2,'0');
+function hl(s){
+  s=s.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
+  let c='';const i=s.indexOf('//');if(i>=0){c=s.slice(i);s=s.slice(0,i)}
+  s=s.replace(/\b(class|int|void|new|this|null|if|else|return|public|static|for)\b/g,'<span class="k">$1</span>')
+     .replace(/\b(Node|AVLTree|String|Math)\b/g,'<span class="t">$1</span>').replace(/\b\d+\b/g,'<span class="n">$&</span>');
+  return s+(c?'<span class="c">'+c+'</span>':'');
+}
+function useContinue(fn){const {reg}=useContext(Ctx);const ref=useRef(fn);ref.current=fn;useEffect(()=>reg(()=>ref.current()),[])}
+function Rich({t}){
+  const {setTerm}=useContext(Ctx);const parts=[];let last=0,m;const re=/\[\[(\w+)(?:\|([^\]]+))?\]\]/g;
+  while((m=re.exec(t))){if(m.index>last)parts.push(t.slice(last,m.index));
+    const key=m[1],label=m[2]||CONTENT.glossary[key].t.toLowerCase();
+    parts.push(<button key={m.index} className="kw" onClick={e=>{e.stopPropagation();setTerm(key)}}>{label}</button>);last=re.lastIndex}
+  if(last<t.length)parts.push(t.slice(last));return <>{parts}</>;
+}
+function Block({id,icon,kicker,title,children}){
+  const {teach,focus,setFocus}=useContext(Ctx);const ref=useRef(null);const [seen,setSeen]=useState(false);
+  useEffect(()=>{const el=ref.current;const io=new IntersectionObserver(es=>{if(es[0].isIntersecting){setSeen(true);io.disconnect()}},{threshold:.04});
+    io.observe(el);const t=setTimeout(()=>setSeen(true),1200);return()=>{io.disconnect();clearTimeout(t)}},[]);
+  const dim=teach&&focus&&focus!==id;
+  return <section ref={ref} className={`block glass rv ${seen?'in':''} ${dim?'dim':''} ${teach&&focus===id?'spot':''}`} onClick={()=>teach&&setFocus(id)}>
+    <div className="bh"><span className="kick">{icon} {kicker}</span><h2>{title}</h2></div>{children}</section>;
+}
+function Expand({label,children}){
+  const [o,setO]=useState(false);
+  return <div style={{marginTop:'.8rem'}}><button className="btn" onClick={()=>setO(!o)}>{o?'▾':'▸'} {label}</button>{o&&<div className="exp-body">{children}</div>}</div>;
+}
+function Code({lines,idxs,active=[],tall,boxRef}){
+  return <div className={'code'+(tall?' tall':'')} ref={boxRef}>{idxs.map(i=><div key={i} className={'ln '+(active.includes(i)?'on':'')}>
+    <span className="no">{i+1}</span><code dangerouslySetInnerHTML={{__html:hl(lines[i])||'&nbsp;'}}/></div>)}</div>;
+}
+function SnippetCode({lines}){return <Code lines={lines} idxs={lines.map((_,i)=>i)}/>}
+
+/* ===================== TREE VIEW (SVG, animated) ===================== */
+const GX=64,GY=76,PAD=38,R=22;
+function layout(root){
+  const pos={};let i=0,md=0;
+  const go=(n,d)=>{if(!n)return;go(n.left,d+1);pos[n.key]={i:i++,d};md=Math.max(md,d);go(n.right,d+1)};
+  go(root,0);return {pos,count:i,depth:root?md+1:1};
+}
+function useTween(target,sig){
+  const [p,setP]=useState(target);const cur=useRef(target);const raf=useRef(0);
+  useEffect(()=>{
+    const from=cur.current,t0=performance.now(),D=650;
+    const tick=now=>{
+      const t=Math.min(1,(now-t0)/D),e=t<.5?2*t*t:1-Math.pow(-2*t+2,2)/2;const nx={};
+      for(const k in target){const a=from[k]||target[k],b=target[k];nx[k]={x:a.x+(b.x-a.x)*e,y:a.y+(b.y-a.y)*e,o:(from[k]||k==='vb')?1:e}}
+      cur.current=nx;setP(nx);if(t<1)raf.current=requestAnimationFrame(tick);
+    };
+    cancelAnimationFrame(raf.current);raf.current=requestAnimationFrame(tick);
+    return()=>cancelAnimationFrame(raf.current);
+  },[sig]);
+  return p;
+}
+function TreeView({root,hl={},showBF=false,showH=false,onNode,sel,h=260}){
+  const L=layout(root);const cnt=Math.max(L.count,3);
+  const W=(cnt-1)*GX+2*PAD,span=(Math.max(L.count,1)-1)*GX+2*PAD,off=(W-span)/2;
+  const Hh=(Math.max(L.depth,2)-1)*GY+2*PAD+(showBF?16:0);
+  const target={vb:{x:W,y:Hh}};
+  for(const k in L.pos)target[k]={x:PAD+off+L.pos[k].i*GX,y:PAD+L.pos[k].d*GY};
+  const p=useTween(target,JSON.stringify(target));const vb=p.vb||target.vb;
+  const edges=[],nodes=[];
+  const walk=n=>{if(!n)return;nodes.push(n);if(n.left){edges.push([n.key,n.left.key]);walk(n.left)}if(n.right){edges.push([n.key,n.right.key]);walk(n.right)}};walk(root);
+  return <svg viewBox={`0 0 ${vb.x} ${vb.y}`} preserveAspectRatio="xMidYMid meet" style={{width:'100%',height:h,display:'block'}}>
+    {!root&&<text className="empty" x={vb.x/2} y={vb.y/2} textAnchor="middle">Empty tree</text>}
+    {edges.map(([a,b])=>{const A=p[a]||target[a],B=p[b]||target[b];return <line key={a+'-'+b} className="edge" x1={A.x} y1={A.y} x2={B.x} y2={B.y}/>})}
+    {nodes.map(n=>{const q=p[n.key]||target[n.key];const bf=BF(n);const st=showBF?(Math.abs(bf)>1?'bad':Math.abs(bf)===1?'warn':'ok'):'';
+      return <g key={n.key} transform={`translate(${q.x},${q.y})`} opacity={q.o==null?1:q.o} onClick={onNode?()=>onNode(n.key):undefined} style={{cursor:onNode?'pointer':'default'}}>
+        <circle r={R} className={`tn ${hl[n.key]||st} ${sel===n.key?'sel':''}`}/>
+        <text className="tt" textAnchor="middle" dy=".35em">{n.key}</text>
+        {showBF&&<text className={`tb ${st}`} textAnchor="middle" y={R+15}>{`BF ${sg(bf)}`}</text>}
+        {showH&&<text className="th" x={R-2} y={-R+4}>{`h${H(n)}`}</text>}
+      </g>})}
+  </svg>;
+}
+
+/* ===================== HERO ===================== */
+const HERO_FRAMES=(()=>{let t=null;const out=[null];[10,20,30,40,50,60,70].forEach(k=>{const r=insertSteps(t,k);r.steps.forEach(s=>{if(s.kind==='placed'||s.kind==='rotate')out.push(s.tree)});t=r.final});return out})();
+function Hero({onStart}){
+  const cv=useRef(null);const [fi,setFi]=useState(0);
+  useEffect(()=>{const t=setInterval(()=>setFi(i=>(i+1)%HERO_FRAMES.length),1700);return()=>clearInterval(t)},[]);
+  useEffect(()=>{
+    const c=cv.current,x=c.getContext('2d');let w,h,raf;const P=[];
+    const rs=()=>{w=c.width=c.offsetWidth;h=c.height=c.offsetHeight};rs();addEventListener('resize',rs);
+    for(let i=0;i<40;i++)P.push({x:Math.random()*w,y:Math.random()*h,vx:(Math.random()-.5)*.25,vy:(Math.random()-.5)*.25,r:Math.random()*1.5+.6});
+    const draw=()=>{x.clearRect(0,0,w,h);const col=getComputedStyle(document.documentElement).getPropertyValue('--ac').trim();x.fillStyle=col;x.strokeStyle=col;
+      P.forEach((p,i)=>{p.x+=p.vx;p.y+=p.vy;if(p.x<0||p.x>w)p.vx*=-1;if(p.y<0||p.y>h)p.vy*=-1;x.globalAlpha=.5;x.beginPath();x.arc(p.x,p.y,p.r,0,7);x.fill();
+        for(let j=i+1;j<P.length;j++){const q=P[j],d=Math.hypot(p.x-q.x,p.y-q.y);if(d<120){x.globalAlpha=(1-d/120)*.15;x.beginPath();x.moveTo(p.x,p.y);x.lineTo(q.x,q.y);x.stroke()}}});
+      raf=requestAnimationFrame(draw)};
+    draw();return()=>{cancelAnimationFrame(raf);removeEventListener('resize',rs)};
+  },[]);
+  return <div className="hero"><canvas ref={cv}/>
+    <div className="herotree"><div><TreeView root={HERO_FRAMES[fi]} h="100%"/></div></div>
+    <div style={{position:'relative'}}>
+      <div className="ring rise">{CONTENT.icon}</div>
+      <div className="kick rise" style={{animationDelay:'.1s'}}>🚀 Master</div>
+      <h1 className="rise" style={{animationDelay:'.2s'}}>{CONTENT.topic}</h1>
+      <p className="mut rise" style={{animationDelay:'.35s',fontSize:'1.15rem'}}>"{CONTENT.tagline}"</p>
+      <div className="rise" style={{animationDelay:'.5s',marginTop:'1.6rem'}}>
+        <button className="btn pri big" onClick={onStart}>START LEARNING →</button>
+        <div className="dots" style={{justifyContent:'center',marginTop:'1.4rem'}}>{CONTENT.stages.map(s=><span key={s} className="dot"/>)}</div>
+        <p className="mut" style={{fontSize:'.78rem',marginTop:'.8rem'}}>← → navigate · Space continue · T teaching mode · P presenter notes</p>
+      </div></div></div>;
+}
+
+/* ===================== 01 INTRO ===================== */
+function WhyBinary(){
+  const C=CONTENT.whyBin;const [b,setB]=useState(false);
+  const tree=b?T(30,T(10),T(50)):T(30,T(50),T(10));
+  const io=inorder(tree);const sorted=io.every((v,i)=>i===0||io[i-1]<v);
+  return <>
+    <Block id="whybin" icon="🌲" kicker="Why binary tree?" title="Trees, and the BST rule">
+      <p className="mut" style={{marginTop:0}}>Tap any highlighted word for a quick explanation.</p>
+      <div className="grid2">
+        <div className="card rise"><h4>🧒 Why a binary tree?</h4><p style={{margin:0}}>{C.kid}</p></div>
+        <div className="card rise" style={{animationDelay:'.12s'}}><h4>🎓 Technical</h4><p style={{margin:0}}><Rich t={C.tech}/></p></div></div>
+      <div className="grid2" style={{marginTop:'1rem'}}>
+        <div className="card rise"><h4>🧒 Why a BST?</h4><p style={{margin:0}}>{C.kid2}</p></div>
+        <div className="card rise" style={{animationDelay:'.12s'}}><h4>🎓 Technical</h4><p style={{margin:0}}><Rich t={C.tech2}/></p></div></div>
+      <h3 className="q">🔎 Same three keys — which one is a BST?</h3>
+      <div className="treebox"><TreeView root={tree} h={200}/></div>
+      <p style={{margin:'.6rem 0 0'}}><span className={'badge '+(sorted?'ok':'bad')}>{sorted?'✅ Valid BST':'❌ Not a BST (still a binary tree)'}</span> <span className="mono mut" style={{fontSize:'.82rem'}}>In-order: {io.join(', ')}</span></p>
+      <p className="mut" style={{fontSize:'.88rem'}}>{sorted?'Left (10) < root (30) < right (50), and in-order is sorted.':'50 is on the LEFT of 30, which breaks the BST rule, so in-order is not sorted.'}</p>
+      <div className="row"><button className="btn pri" disabled={b} onClick={()=>setB(true)}>Make it a BST</button><button className="btn" onClick={()=>setB(false)}>↺ Reset</button></div>
+    </Block></>;
+}
+function Problem(){
+  const P=CONTENT.problem;const [n,setN]=useState(1);const [ask,setAsk]=useState(false);const [rv,setRv]=useState(0);const [ans,setAns]=useState(false);
+  const [vis,setVis]=useState(0);const iv=useRef(null);
+  let tree=null;for(let i=0;i<n;i++)tree=bstIns(tree,P.keys[i]);
+  useEffect(()=>{clearInterval(iv.current);setVis(0)},[n]);useEffect(()=>()=>clearInterval(iv.current),[]);
+  const search=()=>{clearInterval(iv.current);let i=0;setVis(0);iv.current=setInterval(()=>{i++;setVis(i);if(i>=n)clearInterval(iv.current)},550)};
+  const reset=()=>{setN(1);setAsk(false);setRv(0);setAns(false)};
+  useContinue(()=>{if(n<P.keys.length){setN(n+1);return true}if(!ask){setAsk(true);return true}if(rv<P.points.length){setRv(rv+1);return true}if(!ans){setAns(true);return true}return false});
+  const keys=P.keys.slice(0,n);const hlm={};keys.slice(0,vis).forEach(k=>hlm[k]='path');if(vis>=n&&n>0)hlm[keys[n-1]]='found';
+  return <Block id="problem" icon="🔥" kicker="The story" title="Insert keys 10, 20, 30, 40 into a BST">
+    <div className="treebox"><TreeView root={tree} hl={hlm} showH h={Math.min(320,150+n*40)}/></div>
+    <div className="stats">
+      <div className="stat"><b>{n}</b><span>nodes</span></div><div className="stat"><b>{H(tree)}</b><span>height</span></div>
+      <div className="stat"><b>{vis>0?Math.min(vis,n):'—'}</b><span>comparisons to find {keys[n-1]}</span></div></div>
+    <div className="row">
+      <button className="btn pri" disabled={n>=P.keys.length} onClick={()=>setN(n+1)}>＋ Insert {n<P.keys.length?P.keys[n]:'—'}</button>
+      <button className="btn" onClick={search}>🔍 Search {keys[n-1]}</button>
+      <button className="btn" onClick={reset}>↺ Reset</button></div>
+    {n>=3&&<h3 className="q">🤔 Is this tree really behaving like a tree?</h3>}
+    {n>=3&&!ask&&<button className="btn pri" onClick={()=>setAsk(true)}>What is the problem?</button>}
+    {ask&&<>
+      <h3 className="q">🤔 What is the problem?</h3>
+      <p className="mut" style={{marginTop:0}}>Let the room answer first, then reveal one by one.</p>
+      <div className="grid2">{P.points.slice(0,rv).map((p,i)=><div className="card rise" key={i}><div style={{fontSize:'1.5rem'}}>{p.i}</div><h4>{p.t}</h4><span className="mut" style={{fontSize:'.88rem'}}>{p.d}</span></div>)}</div>
+      {rv<P.points.length&&<div className="row"><button className="btn pri" onClick={()=>setRv(rv+1)}>Reveal {rv===0?'first':'next'} problem →</button></div>}
+    </>}
+    {rv>=P.points.length&&ask&&<>
+      <h3 className="q">💭 How can we keep a BST balanced?</h3>
+      {!ans?<button className="btn pri" onClick={()=>setAns(true)}>Reveal the idea</button>
+       :<div className="card rise" style={{borderColor:'var(--ac)'}}><h4>🌳 AVL TREE</h4><p style={{margin:0,fontSize:'1.1rem'}}>Check the balance after every insert and delete — and when one side gets too tall, <b>rotate</b> a few nodes to fix it.</p></div>}
+    </>}
+  </Block>;
+}
+
+/* ===================== 02 BST → AVL ===================== */
+function BstToAvl(){
+  const C=CONTENT.bstavl;const [b,setB]=useState(false);
+  const tree=b?T(20,T(10),T(30)):T(10,null,T(20,null,T(30)));
+  return <>
+    <Block id="cmp" icon="🌲" kicker="BST → AVL" title="Same keys, different shape">
+      <div className="treebox"><TreeView root={tree} showBF showH h={290}/></div>
+      <div className="stats">
+        <div className="stat"><b>{b?'AVL':'BST'}</b><span>current tree</span></div>
+        <div className="stat"><b>{H(tree)}</b><span>height</span></div>
+        <div className="stat"><b>{H(tree)}</b><span>comparisons to find 30 (worst)</span></div></div>
+      <div className="row">
+        <button className="btn pri" disabled={b} onClick={()=>setB(true)}>⚖️ MAKE IT BALANCED</button>
+        <button className="btn" onClick={()=>setB(false)}>↺ Reset</button></div>
+      <p className="mut" style={{fontSize:'.9rem'}}>{b?'A left rotation at 10 made 20 the root. Same three keys, same in-order sequence (10, 20, 30), but the height dropped from 3 to 2.':'Normal BST: 10 → 20 → 30 is a chain. Press the button and watch the nodes move.'}</p>
+    </Block>
+    <Block id="def" icon="📖" kicker="Definition" title="AVL Tree is a self-balancing BST">
+      <p className="mut" style={{marginTop:0}}>Tap any highlighted word for a quick explanation.</p>
+      <div className="grid2">
+        <div className="card rise"><h4>🧒 Explain like I'm 10</h4><p style={{margin:0}}>{C.kid}</p></div>
+        <div className="card rise" style={{animationDelay:'.12s'}}><h4>🎓 Technical definition</h4><p style={{margin:0}}><Rich t={C.tech}/></p></div></div>
+      <div className="card rise" style={{marginTop:'1rem',animationDelay:'.24s',borderColor:'var(--ac)'}}><h4>💡 In one line</h4><p style={{margin:0,fontSize:'1.15rem',fontWeight:700}}>{C.one}</p></div>
+      <Expand label="Go deeper">{C.more}</Expand>
+    </Block></>;
+}
+
+/* ===================== 03 BALANCE ===================== */
+function BalanceFactor(){
+  const INIT=()=>T(30,T(20,T(10)),T(40));
+  const [tree,setTree]=useState(INIT);const [sel,setSel]=useState(null);const [val,setVal]=useState('5');const [msg,setMsg]=useState('');
+  const key=sel!=null&&find(tree,sel)?sel:tree.key;const n=find(tree,key);
+  const l=H(n.left),r=H(n.right),bf=l-r;const st=Math.abs(bf)>1?'bad':Math.abs(bf)===1?'warn':'ok';
+  const bad=diagnose(tree);
+  const add=k=>{const v=k!=null?k:parseInt(val,10);if(Number.isNaN(v))return setMsg('Enter a whole number.');if(find(tree,v))return setMsg(`${v} is already in the tree.`);if(count(tree)>=12)return setMsg('This demo holds up to 12 nodes.');setMsg('');setTree(bstIns(tree,v))};
+  return <Block id="bf" icon="⚖️" kicker="Balance factor" title="Is this node balanced?">
+    <div className="card" style={{marginBottom:'1rem',borderColor:'var(--ac)'}}><h4>💡 In simple words</h4><p style={{margin:0}}>Balance factor tells us whether a node is balanced. Compare how <b>tall</b> its left side and right side are.</p>
+      <div className="mono" style={{marginTop:'.5rem'}}>BF = <Rich t="[[height|Height]]"/>(left) − Height(right)</div></div>
+    <div className="grid2" style={{alignItems:'start'}}>
+      <div style={{minWidth:0}}><div className="treebox"><TreeView root={tree} showBF showH onNode={setSel} sel={key} h={300}/></div>
+        <p className="mut" style={{margin:'.4rem 0 0',fontSize:'.8rem'}}>Click any node. 🟢 BF 0 · 🟡 BF ±1 (balanced but leaning) · 🔴 beyond ±1</p>
+        <div className="row"><input className="in" value={val} onChange={e=>setVal(e.target.value)} inputMode="numeric"/>
+          <button className="btn pri" onClick={()=>add()}>＋ ADD NODE</button><button className="btn" onClick={()=>add(5)}>Add 5</button>
+          <button className="btn" onClick={()=>{setTree(INIT());setSel(null);setMsg('')}}>↺ Reset</button></div>
+        {msg&&<div className="warnbox">⚠️ {msg}</div>}</div>
+      <div className="card">
+        <h4>🔍 Node {key}</h4>
+        <div className="mono">Left height: <b>{l}</b><br/>Right height: <b>{r}</b><br/>BF = {l} − {r}<br/>BF = <b style={{fontSize:'1.2rem'}}>{sg(bf)}</b></div>
+        <p style={{margin:'.6rem 0 0'}}><span className={'badge '+st}>{st==='ok'?'🟢 BALANCED':st==='warn'?'🟡 BALANCED (leaning)':'🔴 UNBALANCED'}</span></p>
+        <p className="mut" style={{fontSize:'.85rem',marginBottom:0}}>{st==='ok'?'Both sides have the same height.':st==='warn'?`The ${bf>0?'left':'right'} side is one level taller — still allowed.`:`The ${bf>0?'left':'right'} side is 2+ levels taller — this node needs a rotation.`}</p>
+        <hr style={{border:0,borderTop:'1px solid var(--bd)',margin:'.8rem 0'}}/>
+        <div className="mono" style={{fontSize:'.82rem'}}>−1, 0, +1 → <span style={{color:'var(--ok)'}}>balanced</span><br/>&lt; −1 or &gt; +1 → <span style={{color:'var(--bad)'}}>unbalanced</span></div>
+        {bad&&<div className="warnbox" style={{marginBottom:0}}>🔴 Node {bad.key} is unbalanced (BF {sg(bad.bf)}) — a plain BST would just stay like this. An AVL tree fixes it with a rotation (next).</div>}
+      </div></div>
+  </Block>;
+}
+function WhyRotate(){
+  const [done,setDone]=useState(false);const t0=CONTENT.cases.LL.tree;const tree=done?rotR(t0):t0;
+  return <Block id="why" icon="🔥" kicker="Why rotations?" title="An unbalanced AVL tree">
+    <div className="treebox"><TreeView root={tree} showBF showH h={290}/></div>
+    {!done?<><p style={{marginBottom:0}}><span className="badge bad">🔴 BF(30) = +2</span> The left side is 2 levels taller than the right side.</p>
+      <h3 className="q">🤔 How can we fix this?</h3>
+      <p className="mut" style={{marginTop:0}}>Can we move nodes without breaking the BST rule? (10 &lt; 20 &lt; 30 must stay in this order.)</p></>
+     :<div className="why"><b>✅ What happened?</b><ol style={{margin:'.4rem 0 0',paddingLeft:'1.2rem'}}>
+       <li>20 (the left child of 30) moved <b>up</b> to become the root.</li><li>30 moved <b>down</b> to become the right child of 20.</li>
+       <li>10 stayed on the left of 20. In-order is still 10, 20, 30.</li><li>Now every BF is 0 → balanced. This move is called a <b>right rotation</b>.</li></ol></div>}
+    <div className="row"><button className="btn pri" disabled={done} onClick={()=>setDone(true)}>🔄 BALANCE THE TREE</button><button className="btn" onClick={()=>setDone(false)}>↺ Reset</button></div>
+  </Block>;
+}
+
+/* ===================== 04 ROTATIONS ===================== */
+function RotationDemo({kase}){
+  const C=CONTENT.cases[kase];
+  const {a,d}=useMemo(()=>{const d=diagnose(C.tree);const a=[C.tree];let t=C.tree;d.rots.forEach(r=>{t=applyRot(t,r);a.push(t)});return {a,d}},[kase]);
+  const [i,setI]=useState(0);const [play,setPlay]=useState(false);const n=a.length-1;
+  useEffect(()=>{if(!play)return;if(i>=n){setPlay(false);return}const t=setTimeout(()=>setI(i+1),1500);return()=>clearTimeout(t)},[play,i]);
+  const hlm=i===0?{[d.key]:'bad',[d.child]:'pivot'}:i<n?{[d.rots[i-1][1]]:'pivot'}:{};
+  const labels=n===1?['BEFORE','AFTER']:['BEFORE','AFTER STEP 1','AFTER STEP 2'];
+  return <div className="card rise" style={{marginTop:'1rem'}}>
+    <div className="row" style={{marginTop:0,justifyContent:'space-between'}}><h3 style={{margin:0}}>{C.name}</h3><span className="tag">{C.tip}</span></div>
+    <div className="stepper" style={{marginTop:'.7rem'}}>{labels.map((l,k)=><button key={k} className={'sdot '+(k===i?'on':k<i?'done':'')} onClick={()=>{setPlay(false);setI(k)}}>{l}</button>)}</div>
+    <div className="grid2" style={{alignItems:'center'}}>
+      <div className="treebox"><TreeView root={a[i]} hl={hlm} showBF h={270}/></div>
+      <div key={i} className="rise"><p style={{fontSize:'1.02rem',marginTop:0}}>{C.texts[i]}</p>
+        <p className="mono mut" style={{fontSize:'.8rem',margin:0}}>In-order: {inorder(a[i]).join(', ')} (never changes)</p>
+        {i===n&&<p style={{color:'var(--ok)',fontWeight:600}}>✅ {C.fix}</p>}</div></div>
+    <div className="row"><button className="btn" disabled={i===0} onClick={()=>{setPlay(false);setI(i-1)}}>← Back</button>
+      <button className="btn pri" disabled={i>=n} onClick={()=>setI(i+1)}>NEXT →</button>
+      <button className="btn" disabled={i>=n} onClick={()=>setPlay(!play)}>{play?'⏸ PAUSE':'▶ PLAY'}</button>
+      <button className="btn" onClick={()=>{setPlay(false);setI(0)}}>↺ RESET</button></div>
+  </div>;
+}
+function Rotations(){
+  const [k,setK]=useState('LL');const ks=['LL','RR','LR','RL'];
+  return <Block id="rot" icon="🔄" kicker="Rotations" title="The four AVL cases">
+    <p className="mut" style={{marginTop:0}}>Pick a case. Rule of thumb: <b>same side twice → one rotation. Different sides → two rotations.</b></p>
+    <div className="grid4">{ks.map(c=><div key={c} className={'card lift '+(k===c?'sel':'')} onClick={()=>setK(c)}>
+      <h4>{CONTENT.cases[c].name}</h4><div className="treebox" style={{border:0,background:'none'}}><TreeView root={CONTENT.cases[c].tree} h={120}/></div>
+      <span className="mut" style={{fontSize:'.75rem'}}>{['LL','RR'].includes(c)?'Single rotation':'Double rotation'}</span></div>)}</div>
+    <RotationDemo key={k} kase={k}/>
+  </Block>;
+}
+function Decision(){
+  const [a,setA]=useState(null);const [b,setB]=useState(null);
+  const kase=a&&b?(a==='L'?(b==='L'?'LL':'LR'):(b==='R'?'RR':'RL')):null;
+  return <Block id="dec" icon="🧠" kicker="Identify" title="Rotation decision tool">
+    <div className="stepper"><span className={'sdot '+(a?'done':'on')}>1. Heavy side</span><span className="mut">→</span><span className={'sdot '+(b?'done':a?'on':'')}>2. Where did the new node go?</span><span className="mut">→</span><span className={'sdot '+(kase?'on':'')}>Result</span></div>
+    <h3 className="q" style={{marginTop:0}}>1️⃣ Which side of the unbalanced node became heavy?</h3>
+    <div className="opts4"><button className={'opt '+(a==='L'?'ok':'')} onClick={()=>{setA('L');setB(null)}}>⬅ LEFT</button><button className={'opt '+(a==='R'?'ok':'')} onClick={()=>{setA('R');setB(null)}}>RIGHT ➡</button></div>
+    {a&&<><h3 className="q rise">2️⃣ Inside that heavy child, which way did the new node go?</h3>
+      <div className="opts4"><button className={'opt '+(b==='L'?'ok':'')} onClick={()=>setB('L')}>⬅ LEFT</button><button className={'opt '+(b==='R'?'ok':'')} onClick={()=>setB('R')}>RIGHT ➡</button></div></>}
+    {kase&&<div className="rise"><h3 className="q">🔄 Required rotation: <span style={{color:'var(--ac)'}}>{kase}</span></h3>
+      <p className="mut" style={{marginTop:0}}>Path: {a==='L'?'Left':'Right'} → {b==='L'?'Left':'Right'} · {CONTENT.cases[kase].fix}</p><RotationDemo key={kase} kase={kase}/></div>}
+    <div className="row"><button className="btn" onClick={()=>{setA(null);setB(null)}}>↺ RESET</button></div>
+  </Block>;
+}
+
+/* ===================== 05 CODE ===================== */
+function CodeSections(){
+  const [s,setS]=useState(0);const [ni,setNi]=useState(-1);const sec=SECS[s];
+  const notes=sec.notes.map(([sub,say])=>({l:lineOf(sub,sec.r[0]),say})).filter(x=>x.l>=sec.r[0]&&x.l<=sec.r[1]);
+  const note=notes[ni];
+  useContinue(()=>{if(ni<notes.length-1){setNi(ni+1);return true}if(s<SECS.length-1){setS(s+1);setNi(-1);return true}return false});
+  return <Block id="code" icon="💻" kicker="Java" title="Reading the AVL code, one piece at a time">
+    <div className="rail">{SECS.map((x,i)=><Fragment key={x.n}><button className={'chip '+(i===s?'on':'')} onClick={()=>{setS(i);setNi(-1)}}>{x.n}</button>{i<SECS.length-1&&<span className="arr">→</span>}</Fragment>)}</div>
+    <div className="grid2" style={{alignItems:'start'}}>
+      <div style={{minWidth:0}}>
+        <Code lines={JAVA} idxs={range(sec.r[0],sec.r[1])} active={note?[note.l]:[]}/>
+        <div className="row">
+          <button className="btn pri" disabled={ni>=notes.length-1} onClick={()=>setNi(ni+1)}>▶ Explain next line</button>
+          <button className="btn" disabled={s>=SECS.length-1} onClick={()=>{setS(s+1);setNi(-1)}}>Next section →</button>
+          <button className="btn" onClick={()=>setNi(-1)}>↺ RESET</button></div></div>
+      <div className="card" key={s}>
+        <span className="tag">SECTION {s+1}/{SECS.length} · {sec.n.toUpperCase()}</span>
+        <h4 style={{margin:'.6rem 0 .2rem'}}>🧠 What does this do?</h4><p style={{margin:0}}>{sec.b}</p>
+        <h4 style={{margin:'.8rem 0 .2rem'}}>🎓 Technical explanation</h4><p style={{margin:0}}>{sec.t}</p>
+        {note&&<div className="why" key={ni}><b>Line {note.l+1}</b><br/>{note.say}</div>}
+      </div></div>
+  </Block>;
+}
+
+/* ===================== 06 LIVE ===================== */
+const SEQS=[{k:[30,20,10],t:'LL'},{k:[10,20,30],t:'RR'},{k:[30,10,20],t:'LR'},{k:[10,30,20],t:'RL'}];
+const linesFor=f=>{if(!f)return[];switch(f.kind){
+  case 'call':return[X.loop,X.call];case 'walk':return X.cmp;case 'placed':return X.nul;case 'check':return[X.hgt,X.bal];case 'imbalance':return[X.bal];
+  case 'case':return[X['if'+f.kase]];case 'done':return[X.last];
+  case 'rotate':{const k=f.kase;if(k==='LL')return[X.retLL];if(k==='RR')return[X.retRR];if(k==='LR')return[f.rotN===1?X.lr1:X.lr2];return[f.rotN===1?X.rl1:X.rl2]}
+  default:return[]}};
+function Sim(){
+  const [si,setSi]=useState(0);const [i,setI]=useState(-1);const [auto,setAuto]=useState(false);const box=useRef(null);
+  const seq=SEQS[si];
+  const frames=useMemo(()=>{let tree=null;const out=[];seq.k.forEach(key=>{out.push({kind:'call',tree,hl:{},title:`insert(${key}) is called`,text:`tree.root = tree.insert(tree.root, ${key});`});const r=insertSteps(tree,key);out.push(...r.steps);tree=r.final});return out},[si]);
+  const code=useMemo(()=>JAVA.map(l=>l.includes('int[] keys')?`        int[] keys = {${seq.k.join(', ')}};`:l),[si]);
+  const last=frames.length-1;const f=i>=0?frames[i]:null;const active=linesFor(f);
+  useEffect(()=>{if(!auto)return;if(i>=last){setAuto(false);return}const t=setTimeout(()=>setI(x=>x+1),1600);return()=>clearTimeout(t)},[auto,i]);
+  useEffect(()=>{const c=box.current;if(!c||!active.length)return;const el=c.querySelector('.ln.on');if(el)c.scrollTo({top:Math.max(0,el.offsetTop-c.clientHeight/3),behavior:'smooth'})},[i,si]);
+  useContinue(()=>{if(i<last){setI(i+1);return true}return false});
+  const upto=frames.slice(0,i+1);const rev=[...upto].reverse();
+  const bfT=(rev.find(x=>x.bfText)||{}).bfText;const kc=(rev.find(x=>x.kase)||{}).kase;
+  const reset=n=>{setAuto(false);setI(-1);if(n!=null)setSi(n)};
+  return <Block id="sim" icon="▶" kicker="Execute" title="Code → Balance factor → Rotation → Tree">
+    <div className="rail"><span className="mut" style={{fontSize:'.8rem'}}>Insert sequence:</span>{SEQS.map((q,n)=><button key={n} className={'chip '+(n===si?'on':'')} onClick={()=>reset(n)}>{q.k.join(', ')} <span style={{opacity:.7}}>({q.t})</span></button>)}</div>
+    <div className="grid2" style={{alignItems:'start'}}>
+      <div style={{minWidth:0}}>
+        <div className="mut" style={{fontSize:'.72rem',fontWeight:700,marginBottom:'.4rem'}}>JAVA CODE</div>
+        <Code lines={code} idxs={range(0,code.length-1)} active={active} tall boxRef={box}/></div>
+      <div style={{minWidth:0}}>
+        <div className="mut" style={{fontSize:'.72rem',fontWeight:700,marginBottom:'.4rem'}}>LIVE AVL TREE</div>
+        <div className="treebox"><TreeView root={f?f.tree:null} hl={f?f.hl:{}} showBF h={290}/></div>
+        {f&&<div className="why" key={i}><b>{f.title}</b><br/>{f.text}</div>}
+        <div className="pipe">
+          <div className={f&&active.length?'hot':''}><b>CODE</b>{active.length?code[active[0]].trim():'—'}</div>
+          <div className={f&&f.bfText?'hot':''}><b>BALANCE FACTOR</b>{bfT||'—'}</div>
+          <div className={f&&(f.kind==='case'||f.kind==='rotate')?'hot':''}><b>ROTATION</b>{kc?`${kc} → ${f&&f.kind==='rotate'?f.title:FIX[kc]}`:'none yet'}</div>
+          <div><b>TREE</b><span className="mono" style={{fontSize:'.75rem'}}>{f?treeStr(f.tree):'∅'}</span></div></div>
+      </div></div>
+    <div className="log">{upto.slice(-4).map((x,k,arr)=><div key={k} className={k===arr.length-1&&i<last?'cur':''}>{k===arr.length-1&&i<last?'▶':'✓'} {linesFor(x).length?`Line ${linesFor(x)[0]+1}: `:''}{x.title}</div>)}{i>=last&&<div style={{color:'var(--ok)'}}>✔ Finished</div>}</div>
+    <div className="row"><button className="btn pri" disabled={auto} onClick={()=>{setI(0);setAuto(true)}}>▶ RUN</button>
+      <button className="btn" disabled={auto||i>=last} onClick={()=>setI(i+1)}>STEP →</button>
+      {auto&&<button className="btn" onClick={()=>setAuto(false)}>⏸ PAUSE</button>}
+      <button className="btn" onClick={()=>reset()}>↺ RESET</button></div>
+  </Block>;
+}
+
+/* ===================== 07 PLAY ===================== */
+function Playground(){
+  const [tree,setTree]=useState(null);const [run,setRun]=useState(null);const [auto,setAuto]=useState(false);const [val,setVal]=useState('50');const [msg,setMsg]=useState('');
+  const last=run?run.steps.length-1:0;const finished=!run||run.i>=last;const shown=run?run.steps[run.i].tree:tree;const step=run?run.steps[run.i]:null;
+  useEffect(()=>{if(run&&run.i>=last)setTree(run.final)},[run]);
+  useEffect(()=>{if(!auto||!run)return;if(run.i>=last){setAuto(false);return}const t=setTimeout(()=>setRun(r=>({...r,i:r.i+1})),1500);return()=>clearTimeout(t)},[auto,run]);
+  useContinue(()=>{if(run&&run.i<last){setRun(r=>({...r,i:r.i+1}));return true}return false});
+  const start=op=>{
+    const k=parseInt(val,10);if(Number.isNaN(k))return setMsg('Enter a whole number first.');if(!finished)return;setMsg('');
+    let r;
+    if(op==='insert'){if(find(tree,k))return setMsg(`${k} is already in the tree (this code ignores duplicates).`);if(count(tree)>=15)return setMsg('This demo holds up to 15 nodes.');r=insertSteps(tree,k)}
+    else if(op==='delete'){if(!find(tree,k))return setMsg(`${k} is not in the tree.`);r=deleteSteps(tree,k)}
+    else r=searchSteps(tree,k);
+    setRun({op,key:k,steps:r.steps,final:r.final,i:0,rotated:!!r.rotated});
+  };
+  const sample=()=>{if(!finished)return;setAuto(false);setRun(null);let t=null;[40,20,60,10,30,50,70].forEach(k=>t=avlIns(t,k));setTree(t);setMsg('')};
+  const reset=()=>{setAuto(false);setRun(null);setTree(null);setMsg('')};
+  const labels=[run&&run.op==='delete'?'BST deletion':'BST insertion','Update height','Calculate balance factor','Check imbalance','Detect case','Perform rotation','Tree balanced'];
+  const kase=run?(run.steps.slice(0,run.i+1).find(s=>s.kase)||{}).kase:null;
+  const st=n=>{const stage=step?step.stage:0;const fin=stage===7;
+    if(n>=5&&n<=6&&fin&&!run.rotated)return 'skip';if(n>stage)return 'wait';if(n===stage&&!fin)return 'now';return 'done'};
+  return <Block id="play" icon="🔬" kicker="Playground" title="Insert, delete and search — step by step">
+    <div className="grid2" style={{alignItems:'start'}}>
+      <div style={{minWidth:0}}>
+        <div className="treebox"><TreeView root={shown} hl={step?step.hl:{}} showBF showH h={340}/></div>
+        <div className="row"><label className="mut" style={{fontSize:'.8rem'}}>Enter value <input className="in" value={val} onChange={e=>setVal(e.target.value)} inputMode="numeric" onKeyDown={e=>e.key==='Enter'&&start('insert')}/></label>
+          <button className="btn pri" disabled={!finished} onClick={()=>start('insert')}>＋ INSERT</button>
+          <button className="btn" disabled={!finished} onClick={()=>start('delete')}>DELETE NODE</button>
+          <button className="btn" disabled={!finished} onClick={()=>start('search')}>SEARCH</button></div>
+        <div className="row">
+          <button className="btn pri" disabled={finished} onClick={()=>setRun({...run,i:run.i+1})}>NEXT STEP →</button>
+          <button className="btn" disabled={finished} onClick={()=>setAuto(!auto)}>{auto?'⏸ PAUSE':'▶ AUTO-PLAY'}</button>
+          <button className="btn" disabled={finished} onClick={()=>{setAuto(false);setRun({...run,i:last})}}>⏭ SKIP</button>
+          <button className="btn" onClick={sample}>Load sample tree</button>
+          <button className="btn" onClick={reset}>↺ RESET TREE</button></div>
+        {msg&&<div className="warnbox">⚠️ {msg}</div>}
+        <p className="mut" style={{fontSize:'.8rem',marginBottom:0}}>Tip: <b>Load sample tree</b> (40,20,60,10,30,50,70), then insert <b>5</b> then <b>3</b> → LL · <b>25</b> then <b>27</b> → LR · <b>80</b> then <b>90</b> → RR. Space = next step.</p>
+      </div>
+      <div className="card"><h4>🔍 What's happening?</h4>
+        {!run?<p className="mut" style={{margin:0}}>Enter a number and press INSERT. The seven checks run here, one step at a time.</p>:<>
+          <span className="tag">{run.op.toUpperCase()} {run.key} · STEP {run.i+1}/{run.steps.length}</span>
+          <div key={run.i} className="why" style={{marginTop:'.6rem'}}><b>{step.title}</b><br/>{step.text}</div>
+          {run.op!=='search'&&<ul className="cklist" style={{marginTop:'.8rem'}}>{labels.map((l,n)=>{const s=st(n+1);const red=n===3&&s==='done'&&run.rotated;
+            return <li key={n} className={red?'red':s}><span className="ic">{red?'🔴':s==='done'?'✅':s==='now'?'▶':s==='skip'?'—':'○'}</span><span>{n+1}. {l}{n===4&&kase&&st(5)!=='wait'?` → ${kase}`:''}{s==='skip'?' (not needed)':''}</span></li>})}</ul>}
+          {finished&&<div className="res"><b>Tree now:</b> {treeStr(run.final)}</div>}</>}
+      </div></div>
+  </Block>;
+}
+
+/* ===================== 08 PRACTICE ===================== */
+function Predict(){
+  const ex=CONTENT.predict;const [i,setI]=useState(0);const [pick,setPick]=useState(null);const [f,setF]=useState(0);const [score,setScore]=useState(0);const [done,setDone]=useState(false);
+  const cur=ex[i];const {d,frames}=useMemo(()=>{const d=diagnose(cur);const a=[cur];let t=cur;d.rots.forEach(r=>{t=applyRot(t,r);a.push(t)});return {d,frames:a}},[i]);
+  useEffect(()=>{if(pick===null||f>=frames.length-1)return;const x=setTimeout(()=>setF(f+1),1400);return()=>clearTimeout(x)},[pick,f,i]);
+  const choose=k=>{if(pick!==null)return;setPick(k);setF(0);if(k===d.kase)setScore(s=>s+1)};
+  const next=()=>{if(i+1>=ex.length)setDone(true);else{setI(i+1);setPick(null);setF(0)}};
+  useContinue(()=>{if(pick!==null&&!done){next();return true}return false});
+  const ph=pick===null?0:f<frames.length-1?2:3;const labels=['Think','Predict','Execute','Understand'];
+  const hlm=pick!==null&&f===0?{[d.key]:'bad',[d.child]:'pivot'}:{};
+  return <Block id="pred" icon="🧪" kicker="Predict the rotation" title="Which rotation is required?">
+    <div className="rail">{labels.map((l,k)=><span key={l} className={'chip '+(k<=ph&&!done?'on':'')} style={{cursor:'default'}}>{k+1}. {l}</span>)}</div>
+    {done?<div style={{textAlign:'center',padding:'1rem'}}><div style={{fontSize:'2.2rem'}}>🧠</div><h3>Correct predictions: {score} / {ex.length}</h3><button className="btn pri" onClick={()=>{setI(0);setPick(null);setF(0);setScore(0);setDone(false)}}>↺ Again</button></div>
+    :<div key={i} className="rise">
+      <b>Tree {i+1} of {ex.length}</b> <span className="mut" style={{fontSize:'.85rem'}}>— find the lowest unbalanced node and decide.</span>
+      <div className="treebox" style={{margin:'.6rem 0'}}><TreeView root={frames[pick===null?0:f]} hl={hlm} showBF={pick!==null} h={280}/></div>
+      <div className="opts4">{['LL','RR','LR','RL'].map(k=><button key={k} disabled={pick!==null} className={'opt '+(pick!==null?(k===d.kase?'ok':k===pick?'bad':''):'')} onClick={()=>choose(k)}>{k}</button>)}</div>
+      {ph===3&&<div className="why"><b>{pick===d.kase?'✅ Correct!':'💡 Not quite'} — it is {d.kase}.</b><br/>
+        Node <b>{d.key}</b> has BF {sg(d.bf)} ({d.bf>0?'left':'right'} side taller). Its {d.bf>0?'left':'right'} child <b>{d.child}</b> has BF {sg(d.cb)}, {d.cb===0?'so a single rotation is enough':`so it leans ${d.cb>0?'left':'right'}`}: {d.bf>0?'Left':'Right'}{d.cb===0?'':' → '+(d.cb>0?'Left':'Right')} = {d.kase}. {FIX[d.kase]}</div>}
+      {ph===3&&<div className="row"><button className="btn pri" onClick={next}>{i+1>=ex.length?'Finish':'Next tree →'}</button></div>}
+    </div>}
+  </Block>;
+}
+
+/* ===================== 09 RECAP ===================== */
+function Mistakes(){
+  const [open,setOpen]=useState({});
+  return <Block id="mist" icon="⚠️" kicker="Watch out" title="Common mistakes">
+    <div className="grid2">{CONTENT.mistakes.map((m,i)=><div className="card" key={i}><span className="tag t2">MISTAKE #{i+1}</span><h4 style={{margin:'.5rem 0'}}>{m.t}</h4>
+      <button className="btn" onClick={()=>setOpen({...open,[i]:!open[i]})}>{open[i]?'HIDE':'WHY?'}</button>
+      {open[i]&&<div className="exp-body"><p style={{margin:'0 0 .4rem'}}>{m.why}</p><p style={{margin:0,color:'var(--ok)'}}><b>✔ Fix:</b> {m.fix}</p></div>}</div>)}</div>
+  </Block>;
+}
+function RealWorld(){
+  const [o,setO]=useState(null);
+  return <Block id="real" icon="🌍" kicker="Real world" title="Where are balanced trees useful?">
+    <div className="grid3">{CONTENT.realworld.map((r,i)=><div key={i} className="card lift" style={o===i?{borderColor:'var(--ac)'}:{}} onClick={()=>setO(o===i?null:i)}>
+      <div style={{fontSize:'1.6rem'}}>{r.icon}</div><h4>{r.t}</h4>
+      {o===i?<p className="mut" style={{margin:0,fontSize:'.88rem',animation:'stg .3s ease backwards'}}>{r.d}</p>:<span className="mut" style={{fontSize:'.78rem'}}>Tap to see why</span>}</div>)}</div>
+  </Block>;
+}
+function Complexity(){
+  const [n,setN]=useState(7);const C=CONTENT.complexity;let b=null,a=null;for(let k=1;k<=n;k++){b=bstIns(b,k);a=avlIns(a,k)}
+  const rows=[10,100,1000,1000000];const lg=x=>Math.ceil(Math.log2(x+1));
+  return <Block id="cx" icon="🏆" kicker="Complexity" title="Chain vs balanced: the same keys 1 … n">
+    <label className="mut" style={{fontSize:'.85rem'}}>Number of keys inserted in ascending order: <b style={{color:'var(--tx)'}}>{n}</b>
+      <input type="range" min="1" max="12" value={n} onChange={e=>setN(+e.target.value)} style={{width:'100%',display:'block',marginTop:'.4rem'}}/></label>
+    <div className="grid2" style={{marginTop:'.8rem'}}>
+      <div><span className="tag t3">NORMAL BST</span><div className="treebox" style={{marginTop:'.4rem'}}><TreeView root={b} showH h={230}/></div><div className="stat" style={{marginTop:'.5rem'}}><b>{H(b)}</b><span>height → worst search = {H(b)} comparisons</span></div></div>
+      <div><span className="tag">AVL TREE</span><div className="treebox" style={{marginTop:'.4rem'}}><TreeView root={a} showH h={230}/></div><div className="stat" style={{marginTop:'.5rem'}}><b>{H(a)}</b><span>height → worst search = {H(a)} comparisons</span></div></div></div>
+    <table className="cmp" style={{marginTop:'1rem'}}><thead><tr><th>OPERATION</th><th>NORMAL BST (worst)</th><th>AVL TREE (worst)</th></tr></thead>
+      <tbody>{C.rows.map(r=><tr key={r[0]}><td>{r[0]}</td><td style={{color:'var(--bad)'}}>{r[1]}</td><td style={{color:'var(--ok)'}}>{r[2]}</td></tr>)}</tbody></table>
+    <h3 className="q">📊 Worst-case comparisons as n grows</h3>
+    <div className="bars">{rows.map(x=><div key={x}><div className="mut" style={{fontSize:'.78rem'}}>n = {x.toLocaleString()}</div>
+      <div className="b" style={{width:'100%',background:'var(--bad)',opacity:.75}}/><div style={{fontSize:'.72rem'}} className="mut">chain: {x.toLocaleString()}</div>
+      <div className="b" style={{width:`${Math.max(1.5,lg(x)/x*100)}%`,background:'var(--ok)'}}/><div style={{fontSize:'.72rem'}} className="mut">balanced ≈ log₂ n: about {lg(x)}</div></div>)}</div>
+    <p className="mut" style={{fontSize:'.85rem'}}>{C.note}</p>
+  </Block>;
+}
+function Recap(){
+  const [k,setK]=useState(0);
+  return <Block id="recap" icon="🚀" kicker="Recap" title="AVL Tree in 30 seconds">
+    <div key={k}>{CONTENT.recap.map((r,i)=><div className="check" key={i} style={{animationDelay:`${i*.35}s`}}><i style={{animationDelay:`${i*.35+.2}s`}}>✓</i><div><b>{i+1}. {r.q}</b><div className="mut">{r.a}</div></div></div>)}</div>
+    <div className="row"><button className="btn" onClick={()=>setK(k+1)}>↻ Replay</button></div>
+  </Block>;
+}
+function MindMap(){
+  const M=CONTENT.mind;const [sel,setSel]=useState({id:'root',label:M.root,d:M.d});
+  return <Block id="mind" icon="🧠" kicker="Final" title="Memory map">
+    <div className="mm"><button className={'mmn root '+(sel.id==='root'?'on':'')} onClick={()=>setSel({id:'root',label:M.root,d:M.d})}>🌳 {M.root}</button><div className="mm-stub"/>
+      <div className="mm-row">{M.branches.map(b=><div className="mm-col" key={b.id}><button className={'mmn '+(sel.id===b.id?'on':'')} onClick={()=>setSel(b)}>{b.icon} {b.label}</button>
+        <div className="mm-kids">{b.kids.map(k=><button key={k.id} className={'mmn '+(sel.id===k.id?'on':'')} onClick={()=>setSel(k)}>{k.label}</button>)}</div></div>)}</div>
+      <div className="mm-detail card" key={sel.id}><b>{sel.label}</b><p style={{margin:'.3rem 0 0'}} className="mut">{sel.d}</p></div></div>
+  </Block>;
+}
+
+/* ===================== 10 CDAC CHALLENGE — 20 MCQs ===================== */
+const TOPICS={binary:'Binary Tree / BST',why:'Why AVL',balance:'Balance Factor',rotation:'Rotations',java:'Java Implementation',advanced:'Advanced / Scenario'};
+const ADVICE={binary:'the BST ordering rule and in-order traversal',why:'why a skewed BST costs O(n) and why balancing fixes it',balance:'height and balance-factor calculation (BF = left − right, allowed −1/0/+1)',rotation:'identifying LL/RR/LR/RL — check the heavy side AND the heavy child\'s side',java:'how getBalance, rotations and insert() detect and repair imbalance',advanced:'multi-step insertion sequences and AVL height reasoning'};
+const LET='ABCD';
+const GET_BAL=['int getBalance(Node node) {','    if (node == null)','        return 0;','    return height(node.left) - height(node.right);','}'];
+const RROT=['Node rightRotate(Node y) {','    Node x = y.left;','    Node T2 = x.right;','    x.right = y;','    y.left = T2;','    y.height = 1 + Math.max(height(y.left), height(y.right));','    x.height = 1 + Math.max(height(x.left), height(x.right));','    return x;','}'];
+const LRBLK=['if (balance > 1 && key > node.left.key) {','    node.left = leftRotate(node.left);','    return rightRotate(node);','}'];
+const MINAVL=T(5,T(3,T(2,T(1)),T(4)),T(7,T(6)));
+
+const MCQS=[
+ {id:1,topic:'binary',diff:'Easy',q:'Which property distinguishes a Binary Search Tree from an ordinary binary tree?',
+  o:['Every node stores its height','Every node has at most two children','For every node, keys in the left subtree are smaller and keys in the right subtree are larger','The tree is always a complete tree'],a:2,
+  why:'Both trees allow at most two children per node, so that cannot be the difference. The BST adds the ordering rule: left subtree < node < right subtree. Storing heights is something AVL adds; completeness is unrelated.'},
+ {id:2,topic:'binary',diff:'Easy',q:'In this BST, which nodes are compared (in order) when searching for key 50?',tree:T(40,T(20,T(10),T(30)),T(60,T(50),T(70))),
+  o:['40, 60, 50','40, 20, 30, 50','40, 60, 70, 50','40, 50'],a:0,
+  why:'50 > 40 → go right to 60. 50 < 60 → go left to 50. Found. Three comparisons: 40, 60, 50. A search follows exactly one root-to-node path.'},
+ {id:3,topic:'binary',diff:'Easy',q:'What is the in-order traversal (Left, Root, Right) of this BST?',tree:T(50,T(30,T(20),T(40)),T(70,null,T(80))),
+  o:['50, 30, 20, 40, 70, 80','20, 40, 30, 80, 70, 50','80, 70, 50, 40, 30, 20','20, 30, 40, 50, 70, 80'],a:3,
+  why:'In-order of a BST always gives ascending order: left subtree (20, 30, 40), then root 50, then right subtree (70, 80). The first option is pre-order and the second is post-order.'},
+ {id:4,topic:'why',diff:'Easy',q:'Keys 10, 20, 30, 40 are inserted in this order into an empty plain BST (no balancing). What is the height of the resulting tree?',after:T(10,null,T(20,null,T(30,null,T(40)))),
+  o:['2','3','4','1'],a:2,
+  why:'Every new key is larger than all earlier keys, so it always goes to the right. The tree becomes a right-leaning chain 10 → 20 → 30 → 40 with height 4 = n.'},
+ {id:5,topic:'why',diff:'Easy',q:'When a BST degenerates into a skewed chain of n nodes, the worst-case time to search is:',
+  o:['O(n)','O(1)','O(log n)','O(n log n)'],a:0,
+  why:'In a chain, the key may be the last node, so up to n comparisons are needed — O(n). That is the same as a linked list.'},
+ {id:6,topic:'why',diff:'Medium',q:'What is the main benefit of rebalancing the tree after every insertion and deletion?',
+  o:['Each node needs less memory','Height stays O(log n), so search, insert and delete stay O(log n) in the worst case','Duplicate keys become allowed','In-order traversal drops to O(log n)'],a:1,
+  why:'Balancing bounds the height to O(log n) even for sorted input. Memory per node actually increases (extra height field), duplicates are unrelated, and in-order traversal still visits all n nodes: O(n).'},
+ {id:7,topic:'balance',diff:'Medium',q:'Which (left height, right height) pair can NOT occur at any node of a valid AVL tree?',
+  o:['(2, 2)','(3, 2)','(1, 2)','(3, 1)'],a:3,
+  why:'AVL requires |left height − right height| ≤ 1 at every node. (3, 1) gives a difference of 2 (BF = +2), which is not allowed. The other pairs give BF 0, +1 and −1.'},
+ {id:8,topic:'balance',diff:'Medium',q:'What is the balance factor of the root node 40 in this tree? (leaf height = 1, empty = 0)',tree:T(40,T(20,T(10,T(5)),T(30)),T(60)),
+  o:['+3','+2','−2','+1'],a:1,
+  why:'Height of left subtree (rooted at 20) = 3 (20 → 10 → 5). Height of right subtree (rooted at 60) = 1. BF = 3 − 1 = +2, so node 40 is unbalanced (left-heavy).'},
+ {id:9,topic:'balance',diff:'Medium',q:'Which is the LOWEST (deepest) unbalanced node in this tree?',tree:T(30,T(20,T(10,T(5))),T(40)),
+  o:['Node 5','Node 10','Node 20','Node 30'],a:2,
+  why:'BF(5) = 0, BF(10) = 1 − 0 = +1 (fine), BF(20) = 2 − 0 = +2 (unbalanced), BF(30) = 3 − 1 = +2 (also unbalanced). The lowest unbalanced node is 20 — and fixing it also fixes 30.'},
+ {id:10,topic:'rotation',diff:'Medium',rot:true,q:'Which rotation balances this tree?',tree:T(30,T(20,T(10))),
+  o:['Left rotation','Right rotation','Left-Right rotation','Right-Left rotation'],a:1,
+  why:'Node 30 is left-heavy (BF +2) and its left child 20 also leans left (BF +1). A straight left line is the LL case → one right rotation at 30.'},
+ {id:11,topic:'rotation',diff:'Hard',rot:true,q:'Which rotation fixes the lowest unbalanced node of this tree?',tree:T(50,T(30),T(70,null,T(80,null,T(90)))),
+  o:['Left rotation at 70','Left rotation at 50','Right rotation at 70','Right-Left rotation at 70'],a:0,
+  why:'Both 70 (BF −2) and 50 (BF −2) look bad, but the lowest unbalanced node is 70. Its right child 80 leans right (BF −1) → RR → one left rotation at 70. That also restores the balance of 50.'},
+ {id:12,topic:'rotation',diff:'Hard',rot:true,q:'Which sequence of rotations balances this tree?',tree:T(30,T(10,null,T(20))),
+  o:['Right rotation at 30 only','Left rotation at 30, then right rotation at 10','Left rotation at 10, then right rotation at 30','Right rotation at 10, then left rotation at 30'],a:2,
+  why:'Node 30 is left-heavy (BF +2) but its left child 10 leans RIGHT (BF −1). The path bends Left → Right: the LR case. First left-rotate the left child (10), turning the bend into a straight LL line, then right-rotate 30.'},
+ {id:13,topic:'rotation',diff:'Hard',rot:true,q:'Which sequence of rotations balances this tree?',tree:T(10,null,T(30,T(20))),
+  o:['Left rotation at 10 only','Right rotation at 30, then left rotation at 10','Left rotation at 30, then right rotation at 10','Right rotation at 10, then left rotation at 30'],a:1,
+  why:'Node 10 is right-heavy (BF −2) but its right child 30 leans LEFT (BF +1). The path bends Right → Left: the RL case. First right-rotate the right child (30), then left-rotate 10.'},
+ {id:14,topic:'rotation',diff:'Medium',rot:true,q:'What is the root of this tree after it has been balanced?',tree:T(50,T(30,T(20))),
+  o:['20','50','30','The tree is unchanged'],a:2,
+  why:'Node 50 has BF +2 and its left child 30 has BF +1 → LL → right rotation at 50. The left child 30 moves up and becomes the new root, with 20 on its left and 50 on its right.'},
+ {id:15,topic:'rotation',diff:'Hard',rot:true,q:'Which case is this? (Check the lowest unbalanced node.)',tree:T(20,T(10),T(40,T(30,T(25)),T(50))),
+  o:['LL','RR','LR','RL'],a:3,
+  why:'Node 20: left height 1, right height 3 → BF −2 (right-heavy). Its right child 40 has BF +1 (leans left). Right then Left → RL: right-rotate 40, then left-rotate 20.'},
+ {id:16,topic:'java',diff:'Hard',q:'For a node whose left subtree has height 1 and right subtree has height 3, what does this method return?',code:GET_BAL,
+  o:['+2','−2','−1','0'],a:1,
+  why:'getBalance returns height(left) − height(right) = 1 − 3 = −2. A negative value means the right side is taller, and |−2| > 1, so the node needs a rotation.'},
+ {id:17,topic:'java',diff:'Hard',q:'In rightRotate, why is y.height recalculated before x.height?',code:RROT,
+  o:['After the rotation y becomes a child of x, and x\'s height depends on y\'s new height','x is always a leaf, so it can be updated last','Java requires variables to be updated in reverse alphabetical order','The order does not matter because both use the same formula'],a:0,
+  why:'After x.right = y, node y sits below x. x\'s height is computed from its children, including y, so y (the lower node) must be updated first. Reversing the order would use a stale y.height.'},
+ {id:18,topic:'java',diff:'Hard',q:'Which case does this block handle, and what does node.left = leftRotate(node.left) do?',code:LRBLK,
+  o:['RL case — it prepares node.right for a left rotation','LL case — it rotates the whole tree to the left','RR case — it moves the new key to the root','LR case — it straightens the left-right bend so rightRotate can finish the job'],a:3,
+  why:'balance > 1 means left-heavy and key > node.left.key means the new key went into the left child\'s RIGHT subtree → LR. The inner leftRotate turns that bend into a straight LL shape; then rightRotate(node) balances it.'},
+ {id:19,topic:'advanced',diff:'Hard',q:'Keys 10, 20, 30, 40, 50 are inserted in this order into an empty AVL tree. Which tree is the result?',
+  optTrees:[T(10,null,T(20,null,T(30,null,T(40,null,T(50))))),T(30,T(20,T(10)),T(40,null,T(50))),T(20,T(10),T(40,T(30),T(50))),T(40,T(20,T(10),T(30)),T(50))],
+  o:['A right-leaning chain','Root 30, with 20(10) on the left and 40(–,50) on the right','Root 20 with children 10 and 40; 40 has children 30 and 50','Root 40; left child 20(10, 30); right child 50'],a:2,
+  after:T(20,T(10),T(40,T(30),T(50))),
+  why:'Insert 10, 20 → chain. Insert 30 → RR at 10 → 20(10, 30). Insert 40 → 30 gets a right child, still balanced. Insert 50 → node 30 has BF −2 with right child 40 leaning right → RR → left rotation at 30 → 40(30, 50). Final: 20(10, 40(30, 50)). Option A is the plain BST result.'},
+ {id:20,topic:'advanced',diff:'Hard',q:'What is the minimum number of nodes in an AVL tree of height 4? (leaf height = 1)',after:MINAVL,
+  o:['4','7','8','15'],a:1,
+  why:'Let N(h) be the minimum nodes for height h. The sparsest tree has a subtree of height h−1 and one of height h−2 under the root: N(h) = N(h−1) + N(h−2) + 1. N(1)=1, N(2)=2, N(3)=4, N(4)=4+2+1=7. The tree shown has exactly 7 nodes. This is why AVL height is always O(log n).'}
+];
+
+function QuestionView({q,pos,len,retry,onAnswer,onNext}){
+  const [pick,setPick]=useState(null);const [fr,setFr]=useState(0);
+  const rot=useMemo(()=>q.rot?rotInfo(q.tree):null,[q.id]);
+  const done=pick!==null;const lastFrame=rot?rot.frames.length-1:0;
+  const choose=k=>{if(pick!==null)return;setPick(k);setFr(0);onAnswer(q.id,k)};
+  useEffect(()=>{if(!rot||!done||fr>=lastFrame)return;const t=setTimeout(()=>setFr(f=>f+1),1500);return()=>clearTimeout(t)},[done,fr]);
+  useEffect(()=>{
+    const h=e=>{if(e.ctrlKey||e.metaKey||e.altKey)return;const m={a:0,b:1,c:2,d:3,'1':0,'2':1,'3':2,'4':3}[String(e.key).toLowerCase()];if(m!==undefined&&pick===null)choose(m)};
+    addEventListener('keydown',h);return()=>removeEventListener('keydown',h);
+  },[pick]);
+  useContinue(()=>{if(pick===null)return true;if(rot&&fr<lastFrame){setFr(fr+1);return true}onNext();return true});
+  const ok=pick===q.a;const last=pos+1>=len;
+  return <div>
+    <div style={{display:'flex',justifyContent:'space-between',alignItems:'center',flexWrap:'wrap',gap:'.4rem'}}>
+      <span><span className="tag t4">{retry?`RETRY · Q${q.id}`:'CDAC LEVEL'}</span> <span className="tag t2">{q.diff.toUpperCase()}</span> <span className="tag">{TOPICS[q.topic].toUpperCase()}</span></span>
+      <b style={{fontSize:'.9rem'}}>{retry?`Retry ${pos+1} / ${len}`:`QUESTION ${pad(q.id)} / 20`}</b></div>
+    <div className="meter"><i style={{width:`${((pos+(done?1:0))/len)*100}%`}}/></div>
+    <div className="qtext">{q.q}</div>
+    {q.tree&&!done&&<div className="treebox" style={{marginBottom:'.6rem'}}><TreeView root={q.tree} h={230}/></div>}
+    {q.code&&<div style={{marginBottom:'.6rem'}}><SnippetCode lines={q.code}/></div>}
+    {q.optTrees?<div className="optgrid">{q.optTrees.map((t,k)=><div key={k} className={'card '+(done?(k===q.a?'ok':k===pick?'bad':''):'')} onClick={()=>choose(k)}>
+        <span className="tag">{LET[k]}</span><TreeView root={t} h={150}/><div className="mut" style={{fontSize:'.78rem'}}>{q.o[k]}</div></div>)}</div>
+     :<div>{q.o.map((o,k)=><button key={k} disabled={done} className={'opt '+(done?(k===q.a?'ok':k===pick?'bad':''):'')} onClick={()=>choose(k)}><span className="l">{LET[k]}.</span><span>{o}</span></button>)}</div>}
+    {!done&&<p className="mut" style={{fontSize:'.78rem',margin:'.4rem 0 0'}}>Click an option or press A / B / C / D. The answer is revealed only after you choose.</p>}
+    {done&&<div className="rise">
+      <div style={{display:'flex',gap:'.6rem',alignItems:'center',flexWrap:'wrap',margin:'1rem 0 .4rem'}}>
+        <span className={'badge '+(ok?'ok':'bad')} style={{fontSize:'1rem'}}>{ok?'✅ Correct!':'❌ Incorrect'}</span>
+        <span className="mut">Your answer: <b>{LET[pick]}</b></span><span className="tag t4">Correct: {LET[q.a]}</span></div>
+      <h4 style={{margin:'.6rem 0 .3rem'}}>🧠 Explanation</h4>
+      <div className="why" style={{marginTop:0}}>{q.why}</div>
+      {rot?<>
+        <div className="pipe">
+          <div className="hot"><b>1 · UNBALANCED NODE</b>Node {rot.d.key} · BF {sg(rot.d.bf)}</div>
+          <div><b>2 · HEAVY CHILD</b>Node {rot.d.child} · BF {sg(rot.d.cb)}</div>
+          <div className="hot"><b>3 · CASE DETECTED</b>{rot.d.kase}</div>
+          <div><b>4 · FIX</b>{FIX[rot.d.kase]}</div></div>
+        <h4 style={{margin:'1rem 0 .4rem'}}>🔄 Rotation animation</h4>
+        <div className="stepper">{rot.frames.map((f,i)=><button key={i} className={'sdot '+(i===fr?'on':i<fr?'done':'')} onClick={()=>setFr(i)}>{f.label}</button>)}</div>
+        <div className="grid2" style={{alignItems:'center'}}>
+          <div className="treebox"><TreeView root={rot.frames[fr].tree} hl={rot.frames[fr].hl} showBF h={260}/></div>
+          <div key={fr} className="rise"><p style={{marginTop:0}}>{rot.frames[fr].text}</p>
+            <p className="mono mut" style={{fontSize:'.8rem',margin:0}}>In-order: {inorder(rot.frames[fr].tree).join(', ')} (unchanged)</p>
+            <p className="mono mut" style={{fontSize:'.8rem',margin:'.3rem 0 0'}}>{rot.d.kase} CASE DETECTED → {rot.d.rots.map(r=>RN[r[0]]).join(' → ')} → {fr===lastFrame?'Balanced Tree ✅':'…'}</p></div></div>
+      </>:(q.after||q.tree)&&<div style={{marginTop:'.8rem'}}><div className="mut" style={{fontSize:'.78rem',fontWeight:700,marginBottom:'.3rem'}}>THE TREE WITH BALANCE FACTORS</div><div className="treebox"><TreeView root={q.after||q.tree} showBF h={240}/></div></div>}
+      <div className="row"><button className="btn pri" onClick={onNext}>{last?'See results →':'Next question →'}</button><span className="mut" style={{fontSize:'.78rem'}}>or press Space</span></div>
+    </div>}
+  </div>;
+}
+
+function Result({answers,onRetryWrong,onRetryAll}){
+  const total=MCQS.length;const correct=MCQS.filter(m=>answers[m.id]===m.a).length;const wrong=MCQS.filter(m=>answers[m.id]!==m.a);
+  const pct=Math.round(correct/total*100);
+  const rows=Object.keys(TOPICS).map(t=>{const qs=MCQS.filter(m=>m.topic===t);return {t,name:TOPICS[t],c:qs.filter(m=>answers[m.id]===m.a).length,n:qs.length}});
+  const weak=rows.filter(r=>r.c/r.n<0.6),strong=rows.filter(r=>r.c===r.n);
+  const level=pct>=85?'Excellent':pct>=60?'Good':'Needs revision';
+  return <div>
+    <div style={{textAlign:'center'}}>
+      <div style={{fontSize:'2.4rem'}}>{pct>=85?'🏆':pct>=60?'👍':'📚'}</div>
+      <h3 style={{margin:'.2rem 0'}}>🌳 AVL TREE CHALLENGE COMPLETE</h3>
+      <div style={{fontSize:'2.6rem',fontWeight:800,fontFamily:'JetBrains Mono,monospace'}}>{correct} / {total}</div>
+      <div className="mut">⭐ {pct}%</div></div>
+    <div className="meter"><i style={{width:`${pct}%`}}/></div>
+    <h3 className="q">📊 Performance</h3>
+    <div className="stats"><div className="stat"><b style={{color:'var(--ok)'}}>{correct}</b><span>Correct</span></div><div className="stat"><b style={{color:'var(--bad)'}}>{wrong.length}</b><span>Wrong</span></div><div className="stat"><b>{pct}%</b><span>Accuracy</span></div></div>
+    <h3 className="q">📚 Topic-wise performance</h3>
+    <table className="cmp"><thead><tr><th>TOPIC</th><th>RESULT</th></tr></thead><tbody>{rows.map(r=><tr key={r.t}><td>{r.name}</td><td><b style={{color:r.c===r.n?'var(--ok)':r.c/r.n<0.6?'var(--bad)':'var(--warn)'}}>{r.c}/{r.n}</b></td></tr>)}</tbody></table>
+    <h3 className="q">🌳 AVL understanding: <span style={{color:pct>=85?'var(--ok)':pct>=60?'var(--warn)':'var(--bad)'}}>{level}</span></h3>
+    <div className="card">
+      {strong.length>0&&<p style={{margin:'0 0 .5rem'}}>✅ <b>Strong:</b> {strong.map(r=>r.name).join(', ')}.</p>}
+      {weak.length>0?<p style={{margin:0}}>🔁 <b>Revise:</b> {weak.map(r=>ADVICE[r.t]).join('; ')}.</p>
+        :wrong.length>0?<p style={{margin:0}}>🔁 <b>Almost there:</b> re-read the explanations for the questions below, then retry them.</p>
+        :<p style={{margin:0}}>No weak areas — you handled the full journey from BST to rotations to Java.</p>}
+      {pct>=85&&<p style={{margin:'.6rem 0 0',fontWeight:700}}>🌳 "I can now solve AVL tree questions."</p>}
+    </div>
+    <div className="row"><button className="btn pri" disabled={wrong.length===0} onClick={onRetryWrong}>🔄 TRY AGAIN — wrong questions only ({wrong.length})</button><button className="btn" onClick={onRetryAll}>↺ Retake all 20</button></div>
+    {wrong.length>0&&<>
+      <h3 className="q">⚠️ Questions you got wrong</h3>
+      <div style={{display:'grid',gap:'1rem'}}>{wrong.map(m=>{const u=answers[m.id];return <div className="card" key={m.id}>
+        <span className="tag t3">Q{m.id} · {TOPICS[m.topic].toUpperCase()}</span>
+        <p style={{fontWeight:700,margin:'.5rem 0'}}>{m.q}</p>
+        {m.code&&<SnippetCode lines={m.code}/>}
+        <p style={{margin:'.6rem 0 .2rem'}}><span style={{color:'var(--bad)'}}>✗ Your answer:</span> <b>{LET[u]}.</b> {m.o[u]}</p>
+        <p style={{margin:'0 0 .4rem'}}><span style={{color:'var(--ok)'}}>✓ Correct:</span> <b>{LET[m.a]}.</b> {m.o[m.a]}</p>
+        <div className="why" style={{marginTop:'.4rem'}}>{m.why}</div>
+        {(m.after||m.tree)&&<div className="treebox" style={{marginTop:'.6rem'}}><TreeView root={m.after||m.tree} showBF h={200}/></div>}
+      </div>})}</div></>}
+  </div>;
+}
+
+function Challenge(){
+  const [phase,setPhase]=useState('intro');const [order,setOrder]=useState([]);const [pos,setPos]=useState(0);const [answers,setAnswers]=useState({});const [retry,setRetry]=useState(false);
+  const begin=(ids,fresh)=>{setOrder(ids);setPos(0);setRetry(!fresh);setAnswers(a=>{if(fresh)return {};const n={...a};ids.forEach(id=>{delete n[id]});return n});setPhase('quiz')};
+  const onAnswer=useCallback((id,k)=>setAnswers(a=>({...a,[id]:k})),[]);
+  const onNext=()=>{if(pos+1>=order.length)setPhase('result');else setPos(pos+1)};
+  const wrongIds=MCQS.filter(m=>answers[m.id]!==m.a).map(m=>m.id);
+  if(phase==='intro')return <div>
+    <p style={{marginTop:0}}>You have seen the whole journey: <b>Binary Tree → BST → the skew problem → AVL → balance factor → rotations → Java → live tree.</b> Now prove it.</p>
+    <div className="grid3">
+      <div className="card"><h4>🎯 20 questions</h4><span className="mut" style={{fontSize:'.88rem'}}>CDAC / PG-DAC level. One at a time. Difficulty rises gradually.</span></div>
+      <div className="card"><h4>🔄 Rotations come alive</h4><span className="mut" style={{fontSize:'.88rem'}}>After a rotation question, the tree animates the fix: node → BF → case → rotation → balanced tree.</span></div>
+      <div className="card"><h4>📊 Full analysis</h4><span className="mut" style={{fontSize:'.88rem'}}>Score, topic-wise breakdown, wrong-answer review, and a retry for only the questions you missed.</span></div></div>
+    <div className="row"><button className="btn pri big" onClick={()=>begin(MCQS.map(m=>m.id),true)}>START CHALLENGE →</button></div></div>;
+  if(phase==='result')return <Result answers={answers} onRetryWrong={()=>begin(wrongIds,false)} onRetryAll={()=>begin(MCQS.map(m=>m.id),true)}/>;
+  const q=MCQS.find(m=>m.id===order[pos]);
+  return <QuestionView key={q.id+'-'+pos+'-'+retry} q={q} pos={pos} len={order.length} retry={retry} onAnswer={onAnswer} onNext={onNext}/>;
+}
+
+/* ===================== SHELL ===================== */
+function Presenter({stage,onClose}){
+  const [s,setS]=useState(0);useEffect(()=>{const t=setInterval(()=>setS(x=>x+1),1000);return()=>clearInterval(t)},[]);
+  const n=CONTENT.notes[Math.max(0,stage)];
+  return <div className="presenter glass"><div style={{display:'flex',justifyContent:'space-between',alignItems:'center'}}><b>👨‍🏫 Presenter · {pad(Math.floor(s/60))}:{pad(s%60)}</b><button className="btn" onClick={onClose}>✕</button></div>
+    <p><b style={{color:'var(--ac)'}}>SAY</b><br/>{n.say}</p><p style={{marginBottom:0}}><b style={{color:'var(--ok)'}}>DO</b><br/>{n.do}</p></div>;
+}
+function App(){
+  const [stage,setStage]=useState(-1);const [teach,setTeach]=useState(false);const [pres,setPres]=useState(false);
+  const [focus,setFocus]=useState(null);const [term,setTerm]=useState(null);const [theme,setTheme]=useState('dark');
+  const handlers=useRef([]);const stageRef=useRef(-1);stageRef.current=stage;const N=CONTENT.stages.length;
+  const reg=useCallback(h=>{handlers.current.push(h);return()=>{handlers.current=handlers.current.filter(x=>x!==h)}},[]);
+  const go=useCallback(i=>{setStage(Math.max(-1,Math.min(N-1,i)));setFocus(null);setTerm(null);window.scrollTo({top:0,behavior:'smooth'})},[]);
+  useEffect(()=>{document.documentElement.dataset.theme=theme},[theme]);
+  useEffect(()=>{document.documentElement.classList.toggle('teach',teach)},[teach]);
+  useEffect(()=>{
+    const onKey=e=>{
+      const tg=e.target.tagName;if(['INPUT','TEXTAREA','SELECT'].includes(tg)||e.ctrlKey||e.metaKey||e.altKey)return;
+      if(e.key==='ArrowRight'){e.preventDefault();go(stageRef.current+1)}
+      else if(e.key==='ArrowLeft'){e.preventDefault();go(stageRef.current-1)}
+      else if(e.key===' '){e.preventDefault();if(document.activeElement&&document.activeElement.blur)document.activeElement.blur();for(const h of [...handlers.current])if(h())return;go(stageRef.current+1)}
+      else if(e.key==='Escape'){setFocus(null);setTerm(null)}
+      else if(e.key==='t'||e.key==='T')setTeach(x=>!x);
+      else if(e.key==='p'||e.key==='P')setPres(x=>!x);
+    };
+    addEventListener('keydown',onKey);return()=>removeEventListener('keydown',onKey);
+  },[go]);
+  const pages=[
+    <><WhyBinary/><Problem/></>,
+    <BstToAvl/>,
+    <><BalanceFactor/><WhyRotate/></>,
+    <><Rotations/><Decision/></>,
+    <CodeSections/>,
+    <Sim/>,
+    <Playground/>,
+    <Predict/>,
+    <><Mistakes/><RealWorld/><Complexity/><Recap/><MindMap/></>,
+    <Block id="chal" icon="🎯" kicker="Final test" title="CDAC-level AVL Tree MCQ Challenge"><Challenge/></Block>
+  ];
+  const glos=CONTENT.glossary;
+  return <Ctx.Provider value={{teach,focus,setFocus,setTerm,reg}}>
+    {stage>=0&&<div className="pbar" style={{width:`${((stage+1)/N)*100}%`}}/>}
+    <header className="top glass">
+      <div className="brand hide-teach">{CONTENT.icon} {CONTENT.topic}</div>
+      <nav className="tabs hide-teach">{CONTENT.stages.map((s,i)=><button key={s} className={'tab '+(i===stage?'on':i<stage?'done':'')} onClick={()=>go(i)}><b>{pad(i+1)}</b><span className="lbl"> {s}</span></button>)}</nav>
+      <div className="ctl">
+        <button className={'btn '+(teach?'on':'')} onClick={()=>setTeach(!teach)} title="Teaching mode (T)">🎤<span className="lbl"> TEACHING MODE</span></button>
+        <button className={'btn '+(pres?'on':'')} onClick={()=>setPres(!pres)} title="Presenter notes (P)">👨‍🏫<span className="lbl"> Presenter</span></button>
+        <button className="btn hide-teach" onClick={()=>setTheme(theme==='dark'?'light':'dark')} title="Theme">{theme==='dark'?'☀️':'🌙'}</button>
+      </div>
+    </header>
+    {stage<0?<Hero onStart={()=>go(0)}/>
+      :<main className="wrap stage" key={stage}>
+        {teach&&<p className="mut" style={{fontSize:'.8rem',marginTop:0}}>🎤 Teaching mode — click a block to spotlight it · Esc to clear</p>}
+        {pages[stage]}</main>}
+    {stage>=0&&<div className="bar glass">
+      <button className="btn" disabled={stage<=0} onClick={()=>go(stage-1)}>← Previous</button>
+      <div className="dots">{CONTENT.stages.map((s,i)=><button key={s} aria-label={s} className={'dot '+(i===stage?'on':i<stage?'done':'')} onClick={()=>go(i)}/>)}</div>
+      <span className="where">Section {stage+1} of {N} · {CONTENT.stages[stage]}</span>
+      <button className="btn pri" disabled={stage>=N-1} onClick={()=>go(stage+1)}>Next →</button>
+    </div>}
+    {term&&<div className="pop glass"><button className="x" onClick={()=>setTerm(null)}>✕</button><b>💡 {glos[term].t}</b><p>{glos[term].d}</p></div>}
+    {pres&&<Presenter stage={stage} onClose={()=>setPres(false)}/>}
+  </Ctx.Provider>;
+}
+ReactDOM.createRoot(document.getElementById('root')).render(<App/>);
+</script>
+</body>
+</html>
